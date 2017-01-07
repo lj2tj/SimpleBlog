@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div id="bd" class="wrp clear-fix">
+                <div id="main">
+                    <div id="detail-title">
+                        <ul id="single-nav">
+                            <li><a href="{% url 'blog:index' %}">首页</a></li>
+                            <li>&gt;</li>
+                            <li>
+                                <ul class="post-categories">
+                                    <li><a href="" title=""
+                                           rel="category">{{ article.category.name }}</a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li>&gt;</li>
+                            <li class="title-active"><a href="{% url 'blog:detail' article.pk %}"
+                                                        rel="bookmark">{{ article.title }}</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="post">
+                        <h3>
+                            <a href="#" class="title">{{ article.title }}</a>
+                        </h3>
+                        <div class="date-read">
+                            <i class="icon-date"></i><span
+                                class="date">{{ article.last_modified_time|date:"Y年n月d日" }}</span>
+                            <i class="icon-money"></i><span
+                                class="date">{{ article.price }}￥</span>
+                        </div>
+                        <div class="post-kw">
+                            <p class="post-label">摘要</p>
+                            <p class="post-value">{{ article.abstract |safe | linebreaks}}</p>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="post-kw">
+                            <p class="post-label">关键词</p>
+                            <p class="post-value">{{ article.keywords |safe }}</p>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="post-kw">
+                            <p class="post-label">Key Words</p>
+                            <p class="post-value">{{ article.en_keywords |safe }}</p>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="post-bd">
+                            <p>{{ article.body | safe | linebreaks}}</p>
+                        </div>
+                        <div class="post-attachment">
+                            <table>
+                            <caption>附件</caption>
+                            <thead>
+                                <tr style="width:100%">
+                                    <th class="col-lg-6 col-md-6 col-sm-6">附件名</th>
+                                    <th class="col-lg-2 col-md-2 col-sm-2">价格</th>
+                                    <th class="col-lg-2 col-md-2 col-sm-2">购买次数</th>
+                                    <th class="col-lg-2 col-md-2 col-sm-2">购买</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="col-lg-6 col-md-6 col-sm-6">{{ article.attachment.name }}</td>
+                                    <th class="col-lg-2 col-md-2 col-sm-2">{{ article.price }}</th>
+                                    <td class="col-lg-2 col-md-2 col-sm-2">{{ article.attachment.download_times}}</td>
+                                    <td class="col-lg-2 col-md-2 col-sm-2"><input type="button" value="购买" /></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% include 'blog/comment.html' %}
+        </div>
+    </div>
+{% endblock %}

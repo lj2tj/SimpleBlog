@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>护理文档资料共享</title>
+    <link rel="stylesheet" href="{% static 'lib/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'blog/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'blog/css/pygments/github.css' %}">
+</head>
+<body>
+<div id="header">
+    <div id="header-warp">
+        <a href="{% url 'blog:index' %}" class="logo">护理专业管理资料</a>
+        <div id="header-right" class="login">
+            <div id="user-info">
+                <a href="{% url 'admin:login' %}"><span id="dropdown-button">登录</span></a>
+            </div>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>
+
+{% block content %}{% endblock %}
+
+<div class="navbar-fixed-bottom footer noselect">
+    <div id="copyright">&copy; 护理文档资料共享</div>
+</div>
+<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+<script type="text/javascript" src="{% static 'blog/js/jquery.js' %}"></script>
+<script type="text/javascript" src="{% static 'lib/js/bootstrap.min.js' %}"></script>
+
+</body>
+</html>
