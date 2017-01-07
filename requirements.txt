@@ -1,0 +1,5 @@
+Django==1.10.5
+markdown2==2.3.1
+Pillow==3.2.0
+Pygments==2.1.3
+pytz==2016.10PyMySQL==0.7.9setuptools=20.10.1
