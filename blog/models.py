@@ -1,4 +1,5 @@
 from django.db import models
+from tinymce.models import HTMLField
 from django.core.urlresolvers import reverse
 from collections import defaultdict
 
@@ -24,7 +25,8 @@ class Article(models.Model):
     objects = ArticleManage()
 
     title = models.CharField('标题', max_length=70)
-    body = models.TextField('正文')
+    #body = models.TextField('正文')
+    body = HTMLField('正文')
     created_time = models.DateTimeField('创建时间')
     last_modified_time = models.DateTimeField('修改时间')
     status = models.CharField('文章状态', max_length=1, choices=STATUS_CHOICES)
@@ -93,7 +95,8 @@ class Tag(models.Model):
 class BlogComment(models.Model):
     user_name = models.CharField('评论者名字', max_length=100)
     user_email = models.EmailField('评论者邮箱', max_length=255)
-    body = models.TextField('评论内容')
+    #body = models.TextField('评论内容')
+    body = HTMLField('评论内容')
     created_time = models.DateTimeField('评论发表时间', auto_now_add=True)
     article = models.ForeignKey('Article', verbose_name='评论所属文章', on_delete=models.CASCADE)
 

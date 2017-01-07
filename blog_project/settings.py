@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'blog',
     'markdown2',
     'pygments',
+    'tinymce',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -56,8 +57,7 @@ ROOT_URLCONF = 'blog_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'blog/templates')]
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'blog/templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -122,3 +122,11 @@ USE_TZ = False
 
 STATIC_URL = '/static/'
 STATICFILES = os.path.join(BASE_DIR, 'blog/static')
+
+#Tiny-mce
+TINYMCE_DEFAULT_CONFIG = {
+    'plugins': "table,spellchecker,paste,searchreplace",
+    'theme': "advanced",
+    'cleanup_on_startup': True,
+    'custom_undo_redo_levels': 10,
+}
