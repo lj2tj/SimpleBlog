@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+#coding=utf-8
+
 from django import template
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 

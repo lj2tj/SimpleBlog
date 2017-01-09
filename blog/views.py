@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+#coding=utf-8
+
 from django.shortcuts import render, get_object_or_404, HttpResponseRedirect
 from django.http import request, response
 from django.views.generic.list import ListView
