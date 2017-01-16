@@ -26,7 +26,7 @@ from blog import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^admin/(?P<article_id>\d+)$', views.AdminEditArticalView.as_view(), name='Edit'),
+    #url(r'^user/register', views.userRegister()),
     url(r'', include('blog.urls', namespace='blog', app_name='blog')),
     url(r'^tinymce/', include('tinymce.urls')),
 ]

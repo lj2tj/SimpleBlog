@@ -1,20 +1,43 @@
 #!/usr/bin/env python
 #coding=utf-8
 
-from django.shortcuts import render, get_object_or_404, HttpResponseRedirect
+from datetime import *
+from django.shortcuts import render, get_object_or_404, HttpResponseRedirect, render_to_response
+from django.template import RequestContext, loader
+from django.contrib.auth.decorators import login_required
 from django.http import request, response
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, FormView
 from blog.models import Article, Attachment, Category, Tag
 import markdown2
-from .models import BlogComment
+from .models import BlogComment, AppSettings
 from .forms import BlogCommentForm, ArticleEditForm
 
 
+
+'''
+def global_setting(request):
+    existing_settings = AppSettings.objects.all()
+    if(existing_settings.count() > 0):
+        return existing_settings.first()
+    pass
+'''
+class About(ListView):
+    template_name = 'blog/about.html'
+
+    def get_queryset(self):
+        settings = AppSettings.objects.all()
+        return settings
+
+    def get_context_data(self, **kwargs):
+        kwargs['category_list'] = Category.objects.all().order_by('name')
+        kwargs['settings'] = AppSettings.objects.all()
+        return super(About, self).get_context_data(**kwargs)
+
 # Create your views here.
 class IndexView(ListView):
-    template_name = "blog/index.html"
+    template_name = "blog/index_summary.html"
     context_object_name = "article_list"
 
     def get_queryset(self):
@@ -24,7 +47,7 @@ class IndexView(ListView):
         return article_list
 
     def get_context_data(self, **kwargs):
-        kwargs['category_list'] = Category.objects.all().order_by('name')
+        kwargs['category_list'] = Category.objects.all().order_by('created_time')
         kwargs['date_archive'] = Article.objects.archive()
         kwargs['tag_list'] = Tag.objects.all().order_by('name')
         return super(IndexView, self).get_context_data(**kwargs)
@@ -49,7 +72,7 @@ class ArticleDetailView(DetailView):
 
 
 class CategoryView(ListView):
-    template_name = "blog/index.html"
+    template_name = "blog/index_summary.html"
     context_object_name = "article_list"
 
     def get_queryset(self):
@@ -59,7 +82,9 @@ class CategoryView(ListView):
         return article_list
 
     def get_context_data(self, **kwargs):
-        kwargs['category_list'] = Category.objects.all().order_by('name')
+        kwargs['category_list'] = Category.objects.all().order_by('created_time')
+        kwargs['date_archive'] = Article.objects.archive()
+        kwargs['tag_list'] = Tag.objects.all().order_by('name')
         return super(CategoryView, self).get_context_data(**kwargs)
 
 
@@ -126,3 +151,62 @@ class AdminEditArticalView(FormView):
         article.body = markdown2.markdown(article.body, extras=['fenced-code-blocks'], )
         return article
     pass
+
+''''
+def userRegister(request):
+    curtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime());
+    if request.user.is_authenticated():  # a*******************
+        return HttpResponseRedirect("/user")
+    try:
+        if request.method == 'POST':
+            username = request.POST.get('username', '')
+            password1 = request.POST.get('password', '')
+            errors = []
+
+            registerForm = RegisterForm({'username': username, 'password1': password1, 'password2': password2,
+                                         'email': email})  # b********
+            if not registerForm.is_valid():
+                errors.extend(registerForm.errors.values())
+                return render_to_response("user/register.html", RequestContext(request, {'curtime': curtime,
+                                                                                             'username': username,
+                                                                                             'email': email,
+                                                                                             'errors': errors}))
+            if password1 != password2:
+                errors.append("两次输入的密码不一致!")
+                return render_to_response("blog/userregister.html", RequestContext(request, {'curtime': curtime,
+                                                                                             'username': username,
+                                                                                             'email': email,
+                                                                                             'errors': errors}))
+
+            filterResult = User.objects.filter(username=username)  # c************
+            if len(filterResult) > 0:
+                errors.append("用户名已存在")
+                return render_to_response("blog/userregister.html", RequestContext(request, {'curtime': curtime,
+                                                                                             'username': username,
+                                                                                             'email': email,
+                                                                                             'errors': errors}))
+
+            user = User()  # d************************
+            user.username = username
+            user.set_password(password1)
+            user.email = email
+            user.save()
+            # 用户扩展信息 profile
+            profile = UserProfile()  # e*************************
+            profile.user_id = user.id
+            profile.phone = phone
+            profile.save()
+            # 登录前需要先验证
+            newUser = auth.authenticate(username=username, password=password1)  # f***************
+            if newUser is not None:
+                auth.login(request, newUser)  # g*******************
+                return HttpResponseRedirect("/user")
+    except Exception, e:
+        errors.append(str(e))
+        return render_to_response("blog/userregister.html", RequestContext(request, {'curtime': curtime,
+                                                                                     'username': username,
+                                                                                     'email': email,
+                                                                                     'errors': errors}))
+
+    return render_to_response("blog/userregister.html", RequestContext(request, {'curtime': curtime}))
+'''

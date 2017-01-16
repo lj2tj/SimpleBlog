@@ -4,12 +4,13 @@
 from django.contrib import admin
 
 # Register your models here.
-from blog.models import Article, Category, Tag, Attachment
+from blog.models import Article, Category, Tag, Attachment, AppSettings
 
 admin.site.register(Article)
 admin.site.register(Attachment)
 admin.site.register(Category)
 admin.site.register(Tag)
+admin.site.register(AppSettings)
 
 '''
 class ArticleCreationForm(Article):  # 编辑用户表单重新定义，继承自UserChangeForm

@@ -3,28 +3,54 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>护理文档资料共享</title>
+    <title></title>
     <link rel="stylesheet" href="{% static 'lib/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'blog/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'blog/css/header.css' %}">
+    <link rel="stylesheet" href="{% static 'blog/css/footer.css' %}">
     <link rel="stylesheet" href="{% static 'blog/css/pygments/github.css' %}">
 </head>
 <body>
-<div id="header">
-    <div id="header-warp">
-        <a href="{% url 'blog:index' %}" class="logo">护理专业管理资料</a>
-        <div id="header-right" class="login">
-            <div id="user-info">
-                <a href="{% url 'admin:login' %}"><span id="dropdown-button">登录</span></a>
-            </div>
+
+<div class="headbox">
+	<div class="headerbox">
+        <a href="{% url 'blog:index' %}" class="newyxklogo">
+            <em>护理知识共享平台</em>
+        </a>
+        <div class="bannerbtn">
+            <a href="/">首页</a>
+            <span></span>
+            {% for category in category_list %}
+                <a href="{% url 'blog:category' category.pk %}">{{ category.name }}</a>
+                <span></span>
+            {% endfor %}
+            <a href="{% url 'blog:about' %}">关于</a>
+            <div class="nw-line" style="display: none;"></div>
+        </div>
+        <!--登录注册-->
+        <div id="beforelogin" class="registerlogin" >
+            <a href="" target="_blank" class="register"><span class="user-status pc-register">注册</span></a>
+            <a href="{% url 'admin:login' %}" class="register"><span class="user-status loginiocn">登录</span></a>
+            <div class="clear"></div>
         </div>
         <div class="clear"></div>
-    </div>
+	</div>
 </div>
 
 {% block content %}{% endblock %}
 
-<div class="navbar-fixed-bottom footer noselect">
-    <div id="copyright">&copy; 护理文档资料共享</div>
+<div class="bottom">
+    <div class="bottomboxd">
+        <span class="linebg"></span>
+        <p>©2012&nbsp;&nbsp;北京XX有限公司&nbsp;&nbsp;All Rights Reserved.&nbsp;&nbsp;注册地址:北京&nbsp;&nbsp;联系电话:82736610</p>
+        <p>
+            <a target="_blank" href="" rel="nofollow" style="margin-right:5px;font-weight:300;">京ICP证1234567号</a>
+            <a style="display:inline-block;text-decoration:none;height:20px;line-height:20px; font-weight:300;" href="" rel="nofollow" target="_blank">
+                <img alt="备案" src="{% static 'blog/img/gongan.png' %}">京公网安备 111111111号
+            </a>
+        </p>
+        <div class="clear"></div>
+    </div>
 </div>
 <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
 <script type="text/javascript" src="{% static 'blog/js/jquery-3.1.1.min.js' %}"></script>

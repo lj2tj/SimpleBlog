@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load staticfiles %}
+<link rel="stylesheet" href="{% static 'blog/css/doc_list.css' %}">
+
+{% for tag in tag_list %}
+<div class="yxkwdbox">
+    <div class="liebietitle">
+        <p class="rmwdiconbig" onclick="window.location.href = '/doclist/hot';">{{ tag.name }}</p>
+        <a href="" target="_blank"></a>
+        <div class="clear"></div>
+    </div>
+    <div class="rmwdlistbox">
+        <ul>
+        {% if not article_list %}
+            <p>还没有上传文档</p>
+        {% else %}
+            {% for article in article_list %}
+            <li>
+                <a href="{% url 'blog:detail' article.id %}" target="_blank" class="zqlistpicd">
+                    <img src="{% static 'blog/img/artical.png' %}" alt="{{ article.title }}">
+                </a>
+                <a href="{% url 'blog:detail' article.id %}" target="_blank" class="zqlisttitled" title="{{ article.title }}">{{ article.title }}</a>
+                <span class="gxauthor">贡献者：<em>{{ article.user.username }}</em></span>
+                <span class="gxtimeli">贡献时间：<em>{{ article.createdtime }}</em></span>
+                <div class="scnts-upload">
+                    <p>{{ article.views }}</p>
+                    <b class="renminbi">{{ article.price }}</b>
+                    <span class="hovered" onclick="">下载</span>
+                    <div class="clear"></div>
+                </div>
+            </li>
+            {% endfor %}
+            {% endif %}
+            <div class="clear"></div>
+        </ul>
+    </div>
+</div>
+
+{% endfor %}
+
+{% endblock %}

@@ -26,6 +26,8 @@
                             <a href="#" class="title">{{ article.title }}</a>
                         </h3>
                         <div class="date-read">
+                            <i class="icon-sprofile"></i><span
+                                class="date">{{ article.user.username }}￥</span>
                             <i class="icon-date"></i><span
                                 class="date">{{ article.last_modified_time|date:"Y年n月d日" }}</span>
                             <i class="icon-money"></i><span
