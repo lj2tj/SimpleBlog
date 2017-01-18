@@ -1,4 +1,4 @@
-####Powered by python 3 and django 1.10
+####Powered by python 2.7 and django 1.8.17
 
 
 1. fork this project to your local
