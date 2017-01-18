@@ -496,11 +496,7 @@ a.backToTop:hover {
     background-image: url(img/backtotop_hover.png);
 }
 
-#main {
-    float: left;
-    overflow-x: hidden;
-    width: 100%
-}
+#main { width:100%; margin:30px auto 0px auto; background:#FFF;}
 
 .post {
     font-family: Arial,"Microsoft YaHei","微软雅黑";
