@@ -13,10 +13,11 @@
             </div>
             <div class="rmwdlistbox">
                 <ul>
-                {% if not tag.article_set.all %}
-                    <p class="empty_list">还没有上传文档</p>
+                {% if not article_list %}
+                    <ptag class="empty_list">还没有上传文档</ptag>
                 {% else %}
-                    {% for article in tag.article_set.all %}
+                    {% for article in article_list %}
+                        TAG ID: {{ article.tags }}
                         <li>
                             <a href="{% url 'blog:detail' article.id %}" target="_blank" class="zqlistpicd">
                                 <img src="{% static 'blog/img/artical.png' %}" alt="{{ article.title }}">

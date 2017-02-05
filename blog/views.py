@@ -14,15 +14,6 @@ import markdown2
 from .models import BlogComment, AppSettings
 from .forms import BlogCommentForm, ArticleEditForm
 
-
-
-'''
-def global_setting(request):
-    existing_settings = AppSettings.objects.all()
-    if(existing_settings.count() > 0):
-        return existing_settings.first()
-    pass
-'''
 class About(ListView):
     template_name = 'blog/about.html'
 
@@ -66,6 +57,7 @@ class ArticleDetailView(DetailView):
 
     # 第五周新增
     def get_context_data(self, **kwargs):
+        kwargs['category_list'] = Category.objects.all().order_by('created_time')
         kwargs['comment_list'] = self.object.blogcomment_set.all()
         kwargs['form'] = BlogCommentForm()
         return super(ArticleDetailView, self).get_context_data(**kwargs)
@@ -73,7 +65,7 @@ class ArticleDetailView(DetailView):
 
 class CategoryView(ListView):
     template_name = "blog/index_summary.html"
-    context_object_name = "article_list"
+    #context_object_name = "article_list"
 
     def get_queryset(self):
         article_list = Article.objects.filter(category=self.kwargs['cate_id'], status='p')
@@ -82,6 +74,7 @@ class CategoryView(ListView):
         return article_list
 
     def get_context_data(self, **kwargs):
+        kwargs['article_list'] = Article.objects.all().order_by('created_time')
         kwargs['category_list'] = Category.objects.all().order_by('created_time')
         kwargs['date_archive'] = Article.objects.archive()
         kwargs['tag_list'] = Tag.objects.all().order_by('name')

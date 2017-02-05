@@ -472,7 +472,7 @@ embed {
 
 #bd {
     margin: 0 auto;
-    width: 800px;
+    width: 100%;
     height: auto;
 }
 
@@ -849,7 +849,7 @@ a.backToTop:hover {
 
 #detail-title {
     display: block;
-    width: 800px;
+    width: 100%;
     margin: 0 auto;
     margin-top: 35px;
     background-color: #fff;
