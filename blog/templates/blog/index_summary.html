@@ -8,22 +8,25 @@
         <div id="main">
         {% for tag in tag_list %}
             <div class="liebietitle">
+                {% comment %}
                 <p class="rmwdiconbig" onclick="window.location.href = '/tag/{{ tag.id }}';">{{ tag.name }}</p>
+                {% endcomment %}
+                <p class="rmwdiconbig">{{ tag.name }}</p>
                 <div class="clear"></div>
             </div>
             <div class="rmwdlistbox">
                 <ul>
-                {% if not article_list %}
+                {% if tag.id not in article_list.tag_set.all %}
                     <ptag class="empty_list">还没有上传文档</ptag>
                 {% else %}
                     {% for article in article_list %}
-                        TAG ID: {{ article.tags }}
                         <li>
+                        {{ article.tag_set.all }}
                             <a href="{% url 'blog:detail' article.id %}" target="_blank" class="zqlistpicd">
                                 <img src="{% static 'blog/img/artical.png' %}" alt="{{ article.title }}">
                             </a>
                             <a href="{% url 'blog:detail' article.id %}" target="_blank" class="zqlisttitled" title="{{ article.title }}">{{ article.title }}</a>
-                            <span class="gxauthor">贡献者：<em>{{ article.user.username }}</em></span>
+                            <span class="gxauthor">贡献者：<em>{{ article.user.username}}</em></span>
                             <span class="gxtimeli">贡献时间：<em>{{ article.createdtime }}</em></span>
                             <div class="scnts-upload">
                                 <p>{{ article.views }}</p>

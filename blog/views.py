@@ -12,7 +12,7 @@ from django.views.generic.edit import CreateView, FormView
 from blog.models import Article, Attachment, Category, Tag
 import markdown2
 from .models import BlogComment, AppSettings
-from .forms import BlogCommentForm, ArticleEditForm
+from .forms import CustomeLoginForm, BlogCommentForm, ArticleEditForm
 
 class About(ListView):
     template_name = 'blog/about.html'
@@ -65,7 +65,7 @@ class ArticleDetailView(DetailView):
 
 class CategoryView(ListView):
     template_name = "blog/index_summary.html"
-    #context_object_name = "article_list"
+    context_object_name = "article_list"
 
     def get_queryset(self):
         article_list = Article.objects.filter(category=self.kwargs['cate_id'], status='p')
@@ -74,10 +74,11 @@ class CategoryView(ListView):
         return article_list
 
     def get_context_data(self, **kwargs):
-        kwargs['article_list'] = Article.objects.all().order_by('created_time')
+        articles = Article.objects.filter(category_id=self.kwargs['cate_id'])
+        kwargs['article_list'] = articles.order_by('created_time')
         kwargs['category_list'] = Category.objects.all().order_by('created_time')
         kwargs['date_archive'] = Article.objects.archive()
-        kwargs['tag_list'] = Tag.objects.all().order_by('name')
+        kwargs['tag_list'] = Tag.objects.all().order_by('created_time')
         return super(CategoryView, self).get_context_data(**kwargs)
 
 
@@ -92,8 +93,9 @@ class TagView(ListView):
         return article_list
 
     def get_context_data(self, **kwargs):
+        #???
         kwargs['category_list'] = Category.objects.all().order_by('created_time')
-        kwargs['tag_list'] = Tag.objects.all().order_by('name')
+        kwargs['tag_list'] = Tag.objects.filter(id=self.kwargs['tag_id']).order_by('name')
         return super(TagView, self).get_context_data(**kwargs)
 
 
@@ -146,61 +148,34 @@ class AdminEditArticalView(FormView):
         return article
     pass
 
-''''
-def userRegister(request):
-    curtime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime());
-    if request.user.is_authenticated():  # a*******************
+def register(request):
+    if request.user.is_authenticated():
         return HttpResponseRedirect("/user")
+
+    errors = []
     try:
         if request.method == 'POST':
-            username = request.POST.get('username', '')
-            password1 = request.POST.get('password', '')
-            errors = []
+            username = request.POST.get('memUserId', '')
+            password1 = request.POST.get('memPassword', '')
+            password_confirm = request.POST.get('password_confirm', '')
 
-            registerForm = RegisterForm({'username': username, 'password1': password1, 'password2': password2,
-                                         'email': email})  # b********
-            if not registerForm.is_valid():
-                errors.extend(registerForm.errors.values())
-                return render_to_response("user/register.html", RequestContext(request, {'curtime': curtime,
-                                                                                             'username': username,
-                                                                                             'email': email,
-                                                                                             'errors': errors}))
-            if password1 != password2:
+            if password1 != password_confirm:
                 errors.append("两次输入的密码不一致!")
-                return render_to_response("blog/userregister.html", RequestContext(request, {'curtime': curtime,
-                                                                                             'username': username,
-                                                                                             'email': email,
+                return render_to_response("user/userregister.html", RequestContext(request, {'memUserId': username,
                                                                                              'errors': errors}))
+        return render_to_response("/")
 
-            filterResult = User.objects.filter(username=username)  # c************
-            if len(filterResult) > 0:
-                errors.append("用户名已存在")
-                return render_to_response("blog/userregister.html", RequestContext(request, {'curtime': curtime,
-                                                                                             'username': username,
-                                                                                             'email': email,
-                                                                                             'errors': errors}))
-
-            user = User()  # d************************
-            user.username = username
-            user.set_password(password1)
-            user.email = email
-            user.save()
-            # 用户扩展信息 profile
-            profile = UserProfile()  # e*************************
-            profile.user_id = user.id
-            profile.phone = phone
-            profile.save()
-            # 登录前需要先验证
-            newUser = auth.authenticate(username=username, password=password1)  # f***************
-            if newUser is not None:
-                auth.login(request, newUser)  # g*******************
-                return HttpResponseRedirect("/user")
     except Exception, e:
         errors.append(str(e))
-        return render_to_response("blog/userregister.html", RequestContext(request, {'curtime': curtime,
-                                                                                     'username': username,
-                                                                                     'email': email,
+        return render_to_response("user/userregister.html", RequestContext(request, {'memUserId': '',
                                                                                      'errors': errors}))
 
-    return render_to_response("blog/userregister.html", RequestContext(request, {'curtime': curtime}))
-'''
+def login(request):
+    """
+    Customer login.
+    """
+    category_list = Category.objects.all().order_by('created_time')
+    if request.user.is_authenticated():
+        return HttpResponseRedirect("/user" )
+    else:
+        return render_to_response("user/Login.html", RequestContext(request, category_list))

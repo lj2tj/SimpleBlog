@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block header %}
+<div class="pcheader">
+	<div class="headerbox">
+        <a href="{% url 'blog:index' %}" class="newyxklogo">
+            <em>护理知识共享平台</em>
+        </a>
+        <div class="bannerbtn">
+            <a href="/">首页</a>
+            <span></span>
+            {% for category in category_list %}
+                <a href="{% url 'blog:category' category.pk %}">{{ category.name }}</a>
+                <span></span>
+            {% endfor %}
+            <a href="{% url 'blog:about' %}">关于</a>
+            <div class="nw-line" style="display: none;"></div>
+        </div>
+	</div>
+</div>
+{% endblock %}
+
+{% block content %}
+    <script type="text/javascript">
+    function  VerifyRegister() {
+        alert('ss')
+        var userName = $("#memUserId");
+        if(userName.val().length <= 0)
+        {
+            userName.focus();
+            var userError = $("#userError")
+            userError.val('用户名不能为空');
+            userError.show();
+            return false;
+        }
+
+        var memPassword = $('#memPassword');
+        var password_confirm = $('#password_confirm');
+        var pswMsg = $("#pswMsg")
+        if(memPassword.val().length <= 0)
+        {
+            memPassword.focus();
+            pswMsg.val('密码不能为空');
+            pswMsg.show();
+            return false;
+        }
+        if(memPassword.val() != password_confirm.val())
+        {
+            pswMsg.val('密码不一致');
+            pswMsg.show();
+            return false;
+        }
+    }
+    </script>
+<link rel="stylesheet" href="{% static 'blog/css/login.css' %}">
+<div class="center" style="height: 439px;">
+    <div class="pc-centerbox">
+        <div class="pc-cenboxleft">
+            <img src="{% static 'blog/img/pc-leftppic.png' %}">
+        </div>
+        <div class="loginbox">
+            <form name="loginForm" method="post">
+            <div class="userphoto" id="userphoto"><img src="{% static 'blog/img/user_default.svg' %}"></div>
+            <div class="needtext">
+                <div class="input-id">
+                    <span id="idnumber"></span>
+                    <input type="text" id="memUserId" name="memUserId" value="" placeholder="手机/邮箱">
+                    <div class="clear"></div>
+                    <!--提示框-->
+                    <div class="tipsboxalert" id="userError" style="display: none;">
+                        <em></em>
+                        <p id="userMsg">用户名不能为空</p>
+                    </div>
+                </div>
+                <div class="input-pas">
+                    <span id="idpass"></span>
+                    <input type="password" id="memPassword" name="memPassword" placeholder="密码">
+                    <input type="hidden" id="jiamiPassword" name="jiamiPassword">
+                    <div class="clear"></div>
+                    <div class="tipsboxalert" id="pswError" style="display: none;">
+                        <em></em>
+                        <p id="pswMsg">密码不能为空</p>
+                    </div>
+                </div>
+                <div class="input-pas">
+                    <span id="idpass"></span>
+                    <input type="password" id="password_confirm" name="memPassword" placeholder="确认密码">
+                    <div class="clear"></div>
+                </div>
+                <input type="submit" disabled="disabled" id="mregister" value="注册" class="tjbtn-login nodjsbtn">
+            </div>
+         </form>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>
+{% endblock %}

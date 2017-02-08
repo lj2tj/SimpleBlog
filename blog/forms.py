@@ -4,6 +4,9 @@
 from django import forms
 from .models import Article, BlogComment
 
+class CustomeLoginForm(forms.ModelForm):
+    class Meta:
+        fields = ['memUserId', 'memPassword']
 
 class BlogCommentForm(forms.ModelForm):
     class Meta:

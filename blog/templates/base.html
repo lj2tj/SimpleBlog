@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="{% static 'blog/css/pygments/github.css' %}">
 </head>
 <body>
-
+{% block header %}
 <div class="headbox">
 	<div class="headerbox">
         <a href="{% url 'blog:index' %}" class="newyxklogo">
@@ -29,13 +29,14 @@
         </div>
         <!--登录注册-->
         <div id="beforelogin" class="registerlogin" >
-            <a href="" target="_blank" class="register"><span class="user-status pc-register">注册</span></a>
-            <a href="{% url 'admin:login' %}" class="register"><span class="user-status loginiocn">登录</span></a>
+            <a href="{% url 'blog:register' %}" class="register"><span class="user-status pc-register">注册</span></a>
+            <a href="{% url 'blog:login' %}" class="register"><span class="user-status loginiocn">登录</span></a>
             <div class="clear"></div>
         </div>
         <div class="clear"></div>
 	</div>
 </div>
+{% endblock %}
 
 {% block content %}{% endblock %}
 
