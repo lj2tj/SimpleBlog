@@ -27,11 +27,13 @@
                         </h3>
                         <div class="date-read">
                             <i class="icon-sprofile"></i><span
-                                class="date">{{ article.user.username }}￥</span>
+                                class="date">{{ article.user.username }}</span>
                             <i class="icon-date"></i><span
                                 class="date">{{ article.last_modified_time|date:"Y年n月d日" }}</span>
                             <i class="icon-money"></i><span
-                                class="date">{{ article.price }}￥</span>
+                                class="date">{{ article.price }}</span>
+                            <i class="icon-unlike" onclick="this.className='icon-like'"></i><span
+                                class="date">{{ article.likes }}</span>
                         </div>
                         <div class="post-kw">
                             <p class="post-label">摘要</p>

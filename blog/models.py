@@ -73,7 +73,7 @@ class Article(models.Model):
     price = models.DecimalField('价格', default=1, blank=False, decimal_places=2, max_digits=6, help_text="文档价格，单位：元")
     attachment = models.ForeignKey('Attachment', verbose_name='附件', null=True, on_delete=models.SET_NULL)
     category = models.ForeignKey('Category', verbose_name='分类', null=True, on_delete=models.SET_NULL)
-    tags = models.ManyToManyField('Tag', verbose_name='标签集合', blank=True)
+    tag = models.ForeignKey('Tag', verbose_name='标签集合', null=True, blank=True)
     user = models.OneToOneField('UserProfile', editable=False, null=True, blank=True)
     #user = models.OneToOneField(settings.AUTH_USER_MODEL)
 
