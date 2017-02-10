@@ -3,8 +3,13 @@
 
 <div class="container">
 
+{% for setting in settings %}
 
-<span>护理专业资料共享平台</span>
+<span>{{ setting.name }}</span>
+<span>{{ setting.value }}</span>
+<br />
+
+{% endfor %}
 
 </div>
 

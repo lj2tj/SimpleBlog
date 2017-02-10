@@ -14,6 +14,7 @@ import markdown2
 from .models import BlogComment, AppSettings
 from .forms import CustomeLoginForm, BlogCommentForm, ArticleEditForm
 
+
 class About(ListView):
     template_name = 'blog/about.html'
 
@@ -32,6 +33,7 @@ class IndexView(ListView):
     context_object_name = "article_list"
 
     def get_queryset(self):
+        settings = AppSettings.objects.all()
         article_list = Article.objects.filter(status='p')
         for article in article_list:
             article.body = markdown2.markdown(article.body, extras=['fenced-code-blocks'], )
@@ -60,6 +62,7 @@ class ArticleDetailView(DetailView):
 
     # 第五周新增
     def get_context_data(self, **kwargs):
+        kwargs['settings'] = AppSettings.objects.all()
         kwargs['category_list'] = Category.objects.all().order_by('created_time')
         kwargs['comment_list'] = self.object.blogcomment_set.all()
         kwargs['form'] = BlogCommentForm()
@@ -77,6 +80,7 @@ class CategoryView(ListView):
         return article_list
 
     def get_context_data(self, **kwargs):
+        kwargs['settings'] = AppSettings.objects.all()
         kwargs['category_list'] = Category.objects.all().order_by('created_time')
         kwargs['date_archive'] = Article.objects.archive()
         kwargs['tag_list'] = Article.objects.filter(category=self.kwargs['cate_id'], status='p')\
@@ -96,6 +100,7 @@ class TagView(ListView):
 
     def get_context_data(self, **kwargs):
         #???
+        kwargs['settings'] = AppSettings.objects.all()
         kwargs['category_list'] = Category.objects.all().order_by('created_time')
         kwargs['tag_list'] = Tag.objects.filter(id=self.kwargs['tag_id']).order_by('name')
         return super(TagView, self).get_context_data(**kwargs)

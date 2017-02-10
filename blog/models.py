@@ -2,6 +2,7 @@
 #coding=utf-8
 
 from django.db import models
+from django.contrib import admin
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from collections import defaultdict
@@ -75,7 +76,6 @@ class Article(models.Model):
     category = models.ForeignKey('Category', verbose_name='分类', null=True, on_delete=models.SET_NULL)
     tag = models.ForeignKey('Tag', verbose_name='标签集合', null=True, blank=True)
     user = models.OneToOneField('UserProfile', editable=False, null=True, blank=True)
-    #user = models.OneToOneField(settings.AUTH_USER_MODEL)
 
     def __str__(self):
         return self.title
@@ -138,23 +138,21 @@ class BlogComment(models.Model):
     def __str__(self):
         return self.body[:20]
 
+class SettingsAdmin(admin.ModelAdmin):
+    list_display = ('name', 'value', 'comment',)
+    search_fields = ('name',)
 
 class AppSettings(models.Model):
     """
     网站基本配置信息
     """
-    application_name = models.CharField('网站显示名', max_length=20, blank=False )
-    application_copyright = models.CharField('版权', max_length=200)
-    register_info = models.CharField('备案信息', max_length=100)
-    telphone1 = models.CharField('联系电话1', max_length=100)
-    telphone2 = models.CharField('联系电话2', max_length=100)
-    telphone3 = models.CharField('联系电话3', max_length=100)
-    email = models.EmailField('电子邮件', max_length=100)
-    small_logo = models.ImageField('小图标', width_field=80, height_field=40, help_text=application_name)
-    medium_logo = models.ImageField('中图标', width_field=200, height_field=80, help_text=application_name)
-    big_logo = models.ImageField('大图标', width_field=400, height_field=200, help_text=application_name)
+    name = models.CharField('名称', max_length=20, null=True)
+    value = models.CharField('显示值', max_length=100, null=True)
+    comment = models.CharField('注释', max_length=200, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         verbose_name = "网站配置"
         verbose_name_plural = verbose_name
-    pass
