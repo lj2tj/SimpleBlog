@@ -31,7 +31,7 @@
                         </a>
                         <a href="{% url 'blog:detail' article.id %}" target="_blank" class="zqlisttitled" title="{{ article.title }}">{{ article.title }}</a>
                         <span class="gxauthor">贡献者：<em>{{ article.user.username}}</em></span>
-                        <span class="gxtimeli">贡献时间：<em>{{ article.createdtime }}</em></span>
+                        <span class="gxtimeli">贡献时间：<em>{{ article.created_time | date:"Y年n月d日" }}</em></span>
                         <div class="scnts-upload">
                             <p>{{ article.views }}</p>
                             <b class="renminbi">{{ article.price }}</b>

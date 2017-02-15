@@ -1,15 +1,17 @@
 #!/usr/bin/env python
 #coding=utf-8
 
+from time import *
 from datetime import *
 from django.shortcuts import render, get_object_or_404, HttpResponseRedirect, render_to_response
 from django.template import RequestContext, loader
+from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.http import request, response
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, FormView
-from blog.models import Article, Attachment, Category, Tag
+from blog.models import Article, Attachment, Category, Tag, UserProfile
 import markdown2
 from .models import BlogComment, AppSettings
 from .forms import CustomeLoginForm, BlogCommentForm, ArticleEditForm
@@ -157,7 +159,7 @@ class AdminEditArticalView(FormView):
 
 def register(request):
     if request.user.is_authenticated():
-        return HttpResponseRedirect("/user")
+        return HttpResponseRedirect("/user/usercenter")
 
     errors = []
     try:
@@ -181,8 +183,33 @@ def login(request):
     """
     Customer login.
     """
-    category_list = Category.objects.all().order_by('created_time')
     if request.user.is_authenticated():
-        return HttpResponseRedirect("/user" )
+        return HttpResponseRedirect("/user/usercenter" )
     else:
-        return render_to_response("user/Login.html", RequestContext(request, category_list))
+        if request.method == 'POST':
+            print("POST")
+            username = request.POST.get('name', '')
+            password = request.POST.get('password', '')
+            user = auth.authenticate(username=username, password=password)
+            if user and user.is_active:
+                auth.login(request, user)
+                return HttpResponseRedirect("/user/usercenter")
+
+        return render_to_response("user/login.html", RequestContext(request, {'curtime': datetime.now()}))
+
+
+class UserCenter(DetailView):
+    model = UserProfile
+    template_name = "user/usercenter.html"
+
+    def get_object(self, queryset=None):
+        obj = super(UserCenter, self).get_object()
+        obj.body = markdown2.markdown(obj.body, extras=['fenced-code-blocks'], )
+        return obj
+
+    # 第五周新增
+    def get_context_data(self, **kwargs):
+        kwargs['settings'] = AppSettings.objects.all()
+        kwargs['category_list'] = Category.objects.all().order_by('created_time')
+        kwargs['comment_list'] = self.object.blogcomment_set.all()
+        return super(UserCenter, self).get_context_data(**kwargs)
