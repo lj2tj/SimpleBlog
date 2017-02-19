@@ -66,10 +66,10 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td class="col-lg-6 col-md-6 col-sm-6">{{ article.attachment.name }}</td>
+                                    <td class="col-lg-6 col-md-6 col-sm-6"><a href="{% url 'blog:purchase' article.id %}">{{ article.attachment.name }}</a></td>
                                     <th class="col-lg-2 col-md-2 col-sm-2">{{ article.price }}</th>
                                     <td class="col-lg-2 col-md-2 col-sm-2">{{ article.attachment.download_times}}</td>
-                                    <td class="col-lg-2 col-md-2 col-sm-2"><input type="button" value="购买" /></td>
+                                    <td class="col-lg-2 col-md-2 col-sm-2"><span class="hovered"><a href="{% url 'blog:purchase' article.id %}">下载</a></span></td>
                                 </tr>
                             </tbody>
                         </table>

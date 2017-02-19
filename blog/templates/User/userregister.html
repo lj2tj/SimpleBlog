@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
-
+{% csrf_token %}
 {% block header %}
 <div class="pcheader">
 	<div class="headerbox">
@@ -23,8 +23,28 @@
 
 {% block content %}
     <script type="text/javascript">
+    function changUserName(obj){
+        if(obj.value.length > 0){
+            var userError = $("#userError")
+            userError.hide()
+        }
+    }
+    
+    function changPsw(obj) {
+        if(obj.value.length > 0){
+            var pswError = $("#pswError")
+            pswError.hide()
+        }
+    }
+
+    function changPswConfirm(obj) {
+        if(obj.value.length > 0){
+            var pswConfirmError = $("#pswConfirmError")
+            pswConfirmError.hide()
+        }
+    }
+
     function  VerifyRegister() {
-        alert('ss')
         var userName = $("#memUserId");
         if(userName.val().length <= 0)
         {
@@ -42,15 +62,16 @@
         {
             memPassword.focus();
             pswMsg.val('密码不能为空');
-            pswMsg.show();
+            $('#pswError').show();
             return false;
         }
-        if(memPassword.val() != password_confirm.val())
+        if(memPassword.val() !== password_confirm.val())
         {
-            pswMsg.val('密码不一致');
-            pswMsg.show();
+            $("#pswMsgConfirm").val('密码不一致');
+            $("#pswConfirmError").show();
             return false;
         }
+        return true;
     }
     </script>
 <link rel="stylesheet" href="{% static 'blog/css/login.css' %}">
@@ -60,37 +81,42 @@
             <img src="{% static 'blog/img/pc-leftppic.png' %}">
         </div>
         <div class="loginbox">
-            <form name="loginForm" method="post">
-            <div class="userphoto" id="userphoto"><img src="{% static 'blog/img/user_default.svg' %}"></div>
-            <div class="needtext">
-                <div class="input-id">
-                    <span id="idnumber"></span>
-                    <input type="text" id="memUserId" name="memUserId" value="" placeholder="手机/邮箱">
-                    <div class="clear"></div>
-                    <!--提示框-->
-                    <div class="tipsboxalert" id="userError" style="display: none;">
-                        <em></em>
-                        <p id="userMsg">用户名不能为空</p>
+            <form name="loginForm" method="POST" action="{% url 'blog:register' %}">
+                {% csrf_token %}
+                <div class="userphoto" id="userphoto"><img src="{% static 'blog/img/user_default.svg' %}"></div>
+                <div class="needtext">
+                    <div class="input-id">
+                        <span id="idnumber"></span>
+                        <input type="text" id="memUserId" name="memUserId" value="" placeholder="手机/邮箱" onkeyup="changUserName(this)">
+                        <div class="clear"></div>
+                        <!--提示框-->
+                        <div class="tipsboxalert" id="userError" style="display: none;">
+                            <em></em>
+                            <p id="userMsg">用户名不能为空</p>
+                        </div>
                     </div>
-                </div>
-                <div class="input-pas">
-                    <span id="idpass"></span>
-                    <input type="password" id="memPassword" name="memPassword" placeholder="密码">
-                    <input type="hidden" id="jiamiPassword" name="jiamiPassword">
-                    <div class="clear"></div>
-                    <div class="tipsboxalert" id="pswError" style="display: none;">
-                        <em></em>
-                        <p id="pswMsg">密码不能为空</p>
+                    <div class="input-pas">
+                        <span id="idpass"></span>
+                        <input type="password" id="memPassword" name="memPassword" placeholder="密码" onkeyup="changPsw(this)">
+                        <input type="hidden" id="jiamiPassword" name="jiamiPassword">
+                        <div class="clear"></div>
+                        <div class="tipsboxalert" id="pswError" style="display: none;">
+                            <em></em>
+                            <p id="pswMsg">密码不能为空</p>
+                        </div>
                     </div>
+                    <div class="input-pas">
+                        <span id="idpass"></span>
+                        <input type="password" id="password_confirm" name="memPassword" placeholder="确认密码" onkeyup="changPswConfirm(this)">
+                        <div class="clear"></div>
+                        <div class="tipsboxalert" id="pswConfirmError" style="display: none;">
+                            <em></em>
+                            <p id="pswMsgConfirm">密码不一致</p>
+                        </div>
+                    </div>
+                    <input type="submit" id="mregister" value="注册" class="tjbtn-login nodjsbtn" onclick="return VerifyRegister()">
                 </div>
-                <div class="input-pas">
-                    <span id="idpass"></span>
-                    <input type="password" id="password_confirm" name="memPassword" placeholder="确认密码">
-                    <div class="clear"></div>
-                </div>
-                <input type="submit" disabled="disabled" id="mregister" value="注册" class="tjbtn-login nodjsbtn">
-            </div>
-         </form>
+            </form>
         </div>
         <div class="clear"></div>
     </div>

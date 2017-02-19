@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 #coding=utf-8
 
+import os
 from time import *
+import markdown2
 from datetime import *
 from django.shortcuts import render, get_object_or_404, HttpResponseRedirect, render_to_response
 from django.template import RequestContext, loader
@@ -12,9 +14,9 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, FormView
 from blog.models import Article, Attachment, Category, Tag, UserProfile
-import markdown2
 from .models import BlogComment, AppSettings
 from .forms import CustomeLoginForm, BlogCommentForm, ArticleEditForm
+from django.http import StreamingHttpResponse
 
 
 class About(ListView):
@@ -28,6 +30,7 @@ class About(ListView):
         kwargs['category_list'] = Category.objects.all().order_by('name')
         kwargs['settings'] = AppSettings.objects.all()
         return super(About, self).get_context_data(**kwargs)
+
 
 # Create your views here.
 class IndexView(ListView):
@@ -146,6 +149,7 @@ class CommentPostView(FormView):
             'comment_list': target_article.blogcomment_set.all(),
         })
 
+
 class AdminEditArticalView(FormView):
     form_class = ArticleEditForm
     template_name = 'admin/editArticle.html'
@@ -156,6 +160,11 @@ class AdminEditArticalView(FormView):
         article.body = markdown2.markdown(article.body, extras=['fenced-code-blocks'], )
         return article
     pass
+
+
+def RegisterPage(request):
+    return render_to_response("user/userregister.html", RequestContext(request))
+
 
 def register(request):
     if request.user.is_authenticated():
@@ -170,14 +179,28 @@ def register(request):
 
             if password1 != password_confirm:
                 errors.append("两次输入的密码不一致!")
-                return render_to_response("user/userregister.html", RequestContext(request, {'memUserId': username,
-                                                                                             'errors': errors}))
+                return render_to_response("/", RequestContext(request, {'memUserId': username,
+                                                                               'errors': errors}))
+            if UserProfile.objects.filter(username=username):
+                errors.append("该用户名已存在!")
+                return render_to_response("/", RequestContext(request, {'memUserId': username,
+                                                                        'errors': errors}))
+            user = UserProfile()
+            user.username = username
+            user.password = password1
+            user.save()
+
         return render_to_response("/")
 
     except Exception, e:
         errors.append(str(e))
         return render_to_response("user/userregister.html", RequestContext(request, {'memUserId': '',
                                                                                      'errors': errors}))
+
+
+def LoginPage(request):
+    return render_to_response("user/login.html", RequestContext(request))
+
 
 def login(request):
     """
@@ -213,3 +236,40 @@ class UserCenter(DetailView):
         kwargs['category_list'] = Category.objects.all().order_by('created_time')
         kwargs['comment_list'] = self.object.blogcomment_set.all()
         return super(UserCenter, self).get_context_data(**kwargs)
+
+
+def Purchase(request):
+    """
+    By a document.
+    """
+    print("====================================")
+    article_id = 'article_id'
+    print('article_id: ', article_id)
+    if not request.user.is_authenticated():
+        return render_to_response("user/login.html", RequestContext(request, {'purchase':True, 'article_id': article_id}))
+    else:
+        if request.method == 'GET':
+            print(request.user)
+
+    the_file_name = Article.objects.filter(id=article_id)
+    print(the_file_name)
+    if the_file_name == None:
+        """TODO : Could not find the file"""
+        return None
+    UploadFilePath = AppSettings.objects.filter(name='UploadFilePath')
+    response = StreamingHttpResponse(file_iterator(os.path.join(UploadFilePath, the_file_name)))
+    response['Content-Type'] = 'application/octet-stream'
+    response['Content-Disposition'] = 'attachment;filename="{0}"'.format(the_file_name)
+
+    return response
+
+
+def file_iterator(file_name, chunk_size=512):
+    """File downloader"""
+    with open(file_name) as f:
+        while True:
+            c = f.read(chunk_size)
+            if c:
+                yield c
+            else:
+                break

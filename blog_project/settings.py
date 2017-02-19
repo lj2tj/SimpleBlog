@@ -29,7 +29,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
-    '182.92.184.139',
+    'localhost',
 ]
 
 # Application definition
@@ -71,13 +71,12 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                #'blog.views.global_setting',
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'blog_project.wsgi.application'
+#WSGI_APPLICATION = 'blog_project.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.9/ref/settings/#databases
@@ -128,6 +127,7 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATICFILES = os.path.join(BASE_DIR, 'blog/static')
 
 #Tiny-mce
@@ -138,5 +138,5 @@ TINYMCE_DEFAULT_CONFIG = {
     'custom_undo_redo_levels': 10,
 }
 
-# File information
-UPLOAD_PATH = os.path.join(BASE_DIR, 'UploadFolder')
+LOGIN_URL = '/login'
+LOGIN_REDIRECT_URL='/'

@@ -35,7 +35,7 @@
                         <div class="scnts-upload">
                             <p>{{ article.views }}</p>
                             <b class="renminbi">{{ article.price }}</b>
-                            <span class="hovered" onclick="">下载</span>
+                            <span class="hovered"><a href="{% url 'blog:purchase' article.id %}">下载</a></span>
                             <div class="clear"></div>
                         </div>
                     </li>

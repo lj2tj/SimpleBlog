@@ -11,6 +11,17 @@ from tinymce.models import HTMLField
 
 import datetime
 
+class WebSiteLevel(models.Model):
+    """User level, used for purchase discount"""
+    LEVEL_CHOICES = (
+        ('A', 'Basic'),
+        ('B', 'Nomal'),
+        ('C', 'Advanced'),
+        ('D', 'Highest'),
+    )
+    levels = models.CharField('等级', max_length=1, choices=LEVEL_CHOICES, default='A')
+    description = models.CharField('说明', max_length=200, null=True)
+
 class JobPosition(models.Model):
     job_title = models.CharField('职务', max_length=20)
 
@@ -36,6 +47,7 @@ class UserProfile(models.Model):
     position = models.ForeignKey('JobPosition', null=True)
     job_title = models.ForeignKey('JobTitle', null=True)
     location = models.CharField('地址', max_length=200, null=True)
+    website_level = models.ForeignKey('WebSiteLevel', default='1')
 
     class Meta:
         verbose_name = "认证作者"
@@ -92,7 +104,6 @@ class Article(models.Model):
 class Attachment(models.Model):
     """文章附件"""
     name = models.CharField('附件名', max_length=120)
-    path = models.FileField(upload_to=settings.UPLOAD_PATH, blank=True)
     upload_time = models.DateTimeField('上传时间', auto_now_add=True)
     download_times = models.PositiveIntegerField('下载次数', default=0, editable=False)
 
@@ -144,7 +155,10 @@ class SettingsAdmin(admin.ModelAdmin):
 
 class AppSettings(models.Model):
     """
-    网站基本配置信息
+    The basic settings of this web site.
+    Include:
+    WebSiteName
+    UploadFilePath
     """
     name = models.CharField('名称', max_length=20, null=True)
     value = models.CharField('显示值', max_length=100, null=True)
