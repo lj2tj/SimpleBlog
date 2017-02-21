@@ -2,21 +2,19 @@
 #coding=utf-8
 
 import os
-from time import *
 import markdown2
 from datetime import *
 from django.shortcuts import render, get_object_or_404, HttpResponseRedirect, render_to_response
 from django.template import RequestContext, loader
 from django.contrib import auth
-from django.contrib.auth.decorators import login_required
-from django.http import request, response
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, FormView
+from django.contrib.auth.models import User
 from blog.models import Article, Attachment, Category, Tag, UserProfile
 from .models import BlogComment, AppSettings
 from .forms import CustomeLoginForm, BlogCommentForm, ArticleEditForm
-from django.http import StreamingHttpResponse
+from django.http import StreamingHttpResponse, HttpResponse, request
 
 
 class About(ListView):
@@ -161,6 +159,18 @@ class AdminEditArticalView(FormView):
         return article
     pass
 
+
+def ValidateUserName(request):
+    name = request.GET.get('name','')
+    if name == '':
+        return HttpResponse("Empty user name error!")
+    else:
+        user = User.objects.filter(username=name)
+        print(user)
+        if user is None or user.__len__() == 0:
+            return HttpResponse('1')
+        else:
+            return HttpResponse('User [%s] already exists' % name)
 
 def RegisterPage(request):
     return render_to_response("user/userregister.html", RequestContext(request))

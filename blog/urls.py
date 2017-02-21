@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^article/(?P<article_id>\d+)/comment/$', views.CommentPostView.as_view(), name='comment'),
     url(r'^about$', views.About.as_view(), name='about'),
     url(r'^user/usercenter$',login_required(views.UserCenter), name='usercenter'),
+    url(r'^ValidateUserName$', views.ValidateUserName, name='ValidateUserName'),
     url(r'^RegisterPage$', views.RegisterPage, name='RegisterPage'),
     url(r'^register$', views.register, name='register'),
     url(r'^login/', views.login, name='login'),
