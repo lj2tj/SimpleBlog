@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title></title>
+    <link href="{% static 'favicon.ico' %}" rel="icon" type="image/x-icon" />
     <link rel="stylesheet" href="{% static 'lib/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'blog/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'blog/css/header.css' %}">
@@ -15,7 +16,7 @@
 <div class="headbox">
 	<div class="headerbox">
         <a href="{% url 'blog:index' %}" class="newyxklogo">
-            <em>护理知识共享平台</em>
+            <em>{{ WebSiteName }}</em>
         </a>
         <div class="bannerbtn">
             <a href="/">首页</a>

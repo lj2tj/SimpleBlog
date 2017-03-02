@@ -2,14 +2,12 @@
 #coding=utf-8
 
 from django.db import models
-from django.contrib import admin
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from collections import defaultdict
 from blog_project import settings
 from tinymce.models import HTMLField
 
-import datetime
 
 class WebSiteLevel(models.Model):
     """User level, used for purchase discount"""
@@ -77,17 +75,23 @@ class Article(models.Model):
     created_time = models.DateTimeField('创建时间', auto_now_add=True)
     last_modified_time = models.DateTimeField('修改时间', auto_now=True)
     status = models.CharField('文章状态', max_length=1, choices=STATUS_CHOICES)
-    abstract = models.TextField('摘要', max_length=1000, blank=True, null=True, help_text="可选，如若为空将摘取正文的前1000个字符")
-    keywords = models.CharField("关键字", max_length=100, blank=True, help_text="关键字之间以逗号（,）分隔")
+    abstract = models.TextField('摘要', max_length=1000, blank=True, 
+        null=True, help_text="可选，如若为空将摘取正文的前1000个字符")
+    keywords = models.CharField("关键字", max_length=100, blank=True, 
+        help_text="关键字之间以逗号（,）分隔")
     en_keywords = models.CharField("Key Words", max_length=100, blank=True, help_text="关键字之间以英文逗号（,）分隔")
     views = models.PositiveIntegerField('浏览量', default=0, editable=False)
     likes = models.PositiveIntegerField('点赞数', default=0, editable=False)
     topped = models.BooleanField('置顶', default=False)
-    price = models.DecimalField('价格', default=1, blank=False, decimal_places=2, max_digits=6, help_text="文档价格，单位：元")
-    attachment = models.ForeignKey('Attachment', verbose_name='附件', null=True, on_delete=models.SET_NULL)
+    price = models.DecimalField('价格', default=1, blank=False, 
+        decimal_places=2, max_digits=6, help_text="文档价格，单位：元")
+    attachment = models.ForeignKey('Attachment', verbose_name='附件', 
+        null=True, on_delete=models.SET_NULL)
     category = models.ForeignKey('Category', verbose_name='分类', null=True, on_delete=models.SET_NULL)
-    tag = models.ForeignKey('Tag', verbose_name='标签集合', null=True, blank=True)
-    user = models.OneToOneField('UserProfile', editable=False, null=True, blank=True)
+    tag = models.ForeignKey('Tag', verbose_name='标签集合', null=True, 
+        blank=True)
+    user = models.OneToOneField('UserProfile', editable=False, null=True, 
+        blank=True)
 
     def __str__(self):
         return self.title
@@ -111,11 +115,17 @@ class Attachment(models.Model):
         verbose_name = "附件"
         verbose_name_plural = verbose_name
 
-        
+
 class Category(models.Model):
+    DISPLAY_MODE = (
+        ('l', 'List'),
+        ('D', 'Detail'),
+    )
+
     name = models.CharField('类名', max_length=20)
     created_time = models.DateTimeField('创建时间', auto_now_add=True)
     last_modified_time = models.DateTimeField('修改时间', auto_now=True)
+    display = models.CharField('显示方式', max_length=1, default='l', choices=DISPLAY_MODE)
 
     def __str__(self):
         return self.name
@@ -149,9 +159,6 @@ class BlogComment(models.Model):
     def __str__(self):
         return self.body[:20]
 
-class SettingsAdmin(admin.ModelAdmin):
-    list_display = ('name', 'value', 'comment',)
-    search_fields = ('name',)
 
 class AppSettings(models.Model):
     """
