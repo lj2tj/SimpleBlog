@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% csrf_token %}
+{% block header %}
+<div class="pcheader">
+	<div class="headerbox">
+        <a href="{% url 'blog:index' %}" class="newyxklogo">
+            <em>护理知识共享平台</em>
+        </a>
+        <div class="bannerbtn">
+            <a href="/">首页</a>
+            <span></span>
+            {% for category in category_list %}
+                <a href="{% url 'blog:category' category.pk %}">{{ category.name }}</a>
+                <span></span>
+            {% endfor %}
+            <a href="{% url 'blog:about' %}">关于</a>
+            <div class="nw-line" style="display: none;"></div>
+        </div>
+	</div>
+</div>
+{% endblock %}
+
+{% block content %}
+    <script type="text/javascript">
+
+    function validateUserName(obj){
+        var userError = $("#userError");
+        if($(obj).val().length <= 0){
+            $('#userMsg').val('用户名不能为空');
+            userError.show();
+            $('#memUserValication').hide();
+            return;
+        }
+
+        $.get("/ValidateUserName", { 'name': obj.value },
+            function(data){
+                if(data != '1'){
+                    $('#userMsg').text(data);
+                    userError.show();
+                    $('#memUserValication').hide();
+                    return false;
+                }else{
+                    $('#memUserValication').show();
+                }
+            });
+    }
+
+    function changUserName(obj){
+        if(obj.value.length > 0){
+            var userError = $("#userError")
+            userError.hide()
+        }
+    }
+    
+    function changPsw(obj) {
+        if(obj.value.length > 0){
+            var pswError = $("#pswError")
+            pswError.hide()
+        }
+    }
+
+    function changPswConfirm(obj) {
+        if(obj.value.length > 0){
+            var pswConfirmError = $("#pswConfirmError")
+            pswConfirmError.hide()
+        }
+    }
+
+    function  VerifyRegister() {
+        var userName = $("#memUserId");
+        if(userName.val().length <= 0)
+        {
+            userName.focus();
+            var userError = $("#userError")
+            $('#userMsg').text('用户名不能为空');
+            userError.show();
+            return false;
+        }
+
+        var memPassword = $('#memPassword');
+        var password_confirm = $('#password_confirm');
+        var pswMsg = $("#pswMsg")
+        if(memPassword.val().length <= 0)
+        {
+            memPassword.focus();
+            pswMsg.val('密码不能为空');
+            $('#pswError').show();
+            return false;
+        }
+        if(memPassword.val() !== password_confirm.val())
+        {
+            $("#pswMsgConfirm").val('密码不一致');
+            $("#pswConfirmError").show();
+            return false;
+        }
+        return true;
+    }
+    </script>
+<link rel="stylesheet" href="{% static 'blog/css/login.css' %}">
+<div class="center" style="height: 439px;">
+    <div class="pc-centerbox">
+        <div class="pc-cenboxleft">
+            <img src="{% static 'blog/img/pc-leftppic.png' %}">
+        </div>
+        <div class="loginbox">
+            <form name="loginForm" method="POST" action="{% url 'blog:register' %}">
+                {% csrf_token %}
+                <div class="userphoto" id="userphoto"><img src="{% static 'blog/img/user_default.svg' %}"></div>
+                <div class="needtext">
+                    <div class="input-id">
+                        <span id="idnumber"></span>
+                        <input type="text" id="memUserId" name="memUserId" value="" placeholder="手机/邮箱" onkeyup="changUserName(this)" onblur="validateUserName(this)">
+                        <span id="memUserValication" style="color: green; display: none; background: none;">OK</span>
+                        <div class="clear"></div>
+                        <!--提示框-->
+                        <div class="tipsboxalert" id="userError" style="display: none;">
+                            <em></em>
+                            <p id="userMsg">用户名不能为空</p>
+                        </div>
+                    </div>
+                    <div class="input-pas">
+                        <span id="idpass"></span>
+                        <input type="password" id="memPassword" name="memPassword" placeholder="密码" onkeyup="changPsw(this)">
+                        <input type="hidden" id="jiamiPassword" name="jiamiPassword">
+                        <div class="clear"></div>
+                        <div class="tipsboxalert" id="pswError" style="display: none;">
+                            <em></em>
+                            <p id="pswMsg">密码不能为空</p>
+                        </div>
+                    </div>
+                    <div class="input-pas">
+                        <span id="idpass"></span>
+                        <input type="password" id="password_confirm" name="memPassword" placeholder="确认密码" onkeyup="changPswConfirm(this)">
+                        <div class="clear"></div>
+                        <div class="tipsboxalert" id="pswConfirmError" style="display: none;">
+                            <em></em>
+                            <p id="pswMsgConfirm">密码不一致</p>
+                        </div>
+                    </div>
+                    <input type="submit" id="mregister" value="注册" class="tjbtn-login nodjsbtn" onclick="return VerifyRegister()">
+                </div>
+            </form>
+        </div>
+        <div class="clear"></div>
+    </div>
+</div>
+{% endblock %}

@@ -4,14 +4,15 @@
 from django.shortcuts import render, get_object_or_404, HttpResponseRedirect, render_to_response
 from django.template import RequestContext, loader
 from django.contrib import auth
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, FormView
-from django.contrib.auth.models import User
 from blog.models import UserProfile
-from .models import BlogComment, AppSettings
-from .forms import CustomeLoginForm, BlogCommentForm, ArticleEditForm
-from django.http import StreamingHttpResponse, HttpResponse, request
+from blog.models import BlogComment, AppSettings
+from blog.forms import CustomeLoginForm, BlogCommentForm, ArticleEditForm
+from django.http import StreamingHttpResponse, HttpResponse
 
 
 
@@ -33,7 +34,7 @@ def RegisterPage(request):
 
 def register(request):
     if request.user.is_authenticated():
-        return HttpResponseRedirect("/user/usercenter")
+        return HttpResponseRedirect("/usercenter")
 
     errors = []
     try:
@@ -72,7 +73,7 @@ def login(request):
     Customer login.
     """
     if request.user.is_authenticated():
-        return HttpResponseRedirect("/user/usercenter" )
+        return HttpResponseRedirect("/usercenter" )
     else:
         if request.method == 'POST':
             print("POST")
@@ -81,51 +82,46 @@ def login(request):
             user = auth.authenticate(username=username, password=password)
             if user and user.is_active:
                 auth.login(request, user)
-                return HttpResponseRedirect("/user/usercenter")
+                return HttpResponseRedirect("/usercenter")
 
         return render_to_response("user/login.html", RequestContext(request, {'curtime': datetime.now()}))
 
 
-class UserCenter(DetailView):
-    model = UserProfile
-    template_name = "user/usercenter.html"
+def UserCenter(request):
+    if not request.user.is_authenticated():
+        return render_to_response("user/login.html", RequestContext(request))
 
-    def get_object(self, queryset=None):
-        obj = super(UserCenter, self).get_object()
-        obj.body = markdown2.markdown(obj.body, extras=['fenced-code-blocks'], )
-        return obj
-
-    # 第五周新增
-    def get_context_data(self, **kwargs):
-        kwargs['settings'] = AppSettings.objects.all()
-        kwargs['category_list'] = Category.objects.all().order_by('created_time')
-        kwargs['comment_list'] = self.object.blogcomment_set.all()
-        return super(UserCenter, self).get_context_data(**kwargs)
+    return render_to_response("user/usercenter.html", RequestContext(request))
 
 
 def Purchase(request):
     """
     By a document.
     """
-    print("====================================")
-    article_id = 'article_id'
-    print('article_id: ', article_id)
+    article_id = '-1'
     if not request.user.is_authenticated():
         return render_to_response("user/login.html", RequestContext(request, {'purchase':True, 'article_id': article_id}))
     else:
         if request.method == 'GET':
-            print(request.user)
+            article_id = request.GET.get('article_id', '-1')
+        else:
+            article_id = -1
+
+    if article_id == -1:
+        return HttpResponse('No such file.')
 
     the_file_name = Article.objects.filter(id=article_id)
-    print(the_file_name)
     if the_file_name == None:
         """TODO : Could not find the file"""
-        return None
+        return HttpResponse('No such file.')
+
     UploadFilePath = AppSettings.objects.filter(name='UploadFilePath')
+    if UploadFilePath == null:
+        return HttpResponse('System setting error, UploadFilePath is empty.')
+
     response = StreamingHttpResponse(file_iterator(os.path.join(UploadFilePath, the_file_name)))
     response['Content-Type'] = 'application/octet-stream'
     response['Content-Disposition'] = 'attachment;filename="{0}"'.format(the_file_name)
-
     return response
 
 

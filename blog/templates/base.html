@@ -29,11 +29,18 @@
             <div class="nw-line" style="display: none;"></div>
         </div>
         <!--登录注册-->
-        <div id="beforelogin" class="registerlogin" >
-            <a href="{% url 'blog:RegisterPage' %}" class="register"><span class="user-status pc-register">注册</span></a>
-            <a href="{% url 'blog:LoginPage' %}" class="register"><span class="user-status loginiocn">登录</span></a>
-            <div class="clear"></div>
-        </div>
+        {% if request.user.username != "" %}
+            <div class="registerlogin" >
+                <a href="admin/logout"><span class="pc-register">退出</span></a>
+                <a href="{% url 'blog:usercenter' %}"><span class="loginiocn">{{ request.user.username }}</span></a>
+            </div>
+        {% else %}
+            <div class="registerlogin" >
+                <a href="{% url 'blog:RegisterPage' %}"><span class="pc-register">注册</span></a>
+                <a href="{% url 'blog:LoginPage' %}"><span class="loginiocn">登录</span></a>
+                <div class="clear"></div>
+            </div>
+        {% endif %}
         <div class="clear"></div>
 	</div>
 </div>
