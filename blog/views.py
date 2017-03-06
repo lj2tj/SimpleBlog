@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 #coding=utf-8
 
-import os
 import markdown2
 from datetime import *
 from django.shortcuts import render, get_object_or_404, HttpResponseRedirect, render_to_response
@@ -16,8 +15,13 @@ from .models import BlogComment, AppSettings
 from .forms import CustomeLoginForm, BlogCommentForm, ArticleEditForm
 from django.http import StreamingHttpResponse, HttpResponse, request
 
+WebSiteName = AppSettings.objects.filter(name='WebSiteName')[0].value
 
 class About(ListView):
+    """
+    Website about page.
+    """
+
     template_name = 'blog/about.html'
 
     def get_queryset(self):
@@ -25,32 +29,40 @@ class About(ListView):
         return settings
 
     def get_context_data(self, **kwargs):
+        kwargs['WebSiteName'] = WebSiteName
         kwargs['category_list'] = Category.objects.all().order_by('name')
         kwargs['settings'] = AppSettings.objects.all()
         return super(About, self).get_context_data(**kwargs)
 
 
-# Create your views here.
 class IndexView(ListView):
+    """
+    The index page, show all artiicles.
+    """
+
     template_name = "blog/index_summary.html"
     context_object_name = "article_list"
 
     def get_queryset(self):
-        settings = AppSettings.objects.all()
         article_list = Article.objects.filter(status='p')
         for article in article_list:
             article.body = markdown2.markdown(article.body, extras=['fenced-code-blocks'], )
         return article_list
 
     def get_context_data(self, **kwargs):
+        kwargs['WebSiteName'] = WebSiteName
         kwargs['category_list'] = Category.objects.all().order_by('created_time')
         kwargs['date_archive'] = Article.objects.archive()
         kwargs['tag_list'] = Article.objects.filter(status='p')\
-            .values('tag__id', 'tag__name','created_time').order_by('created_time')
+            .values('tag__id', 'tag__name', 'created_time').order_by('created_time')
         return super(IndexView, self).get_context_data(**kwargs)
 
 
 class ArticleDetailView(DetailView):
+    """
+    Article detail view, this view will display all the detail information of an article.
+    """
+
     model = Article
     template_name = "blog/detail.html"
     context_object_name = "article"
@@ -64,7 +76,7 @@ class ArticleDetailView(DetailView):
         return obj
 
     def get_context_data(self, **kwargs):
-        kwargs['settings'] = AppSettings.objects.all()
+        kwargs['WebSiteName'] = WebSiteName
         kwargs['category_list'] = Category.objects.all().order_by('created_time')
         kwargs['comment_list'] = self.object.blogcomment_set.all()
         kwargs['form'] = BlogCommentForm()
@@ -72,6 +84,10 @@ class ArticleDetailView(DetailView):
 
 
 class CategoryView(ListView):
+    """
+    Show all files in a category.
+    """
+
     template_name = "blog/index_summary.html"
     context_object_name = "article_list"
 
@@ -82,15 +98,19 @@ class CategoryView(ListView):
         return article_list
 
     def get_context_data(self, **kwargs):
-        kwargs['WebSiteName'] = AppSettings.objects.filter(name='WebSiteName')
+        kwargs['WebSiteName'] = WebSiteName
         kwargs['category_list'] = Category.objects.all().order_by('created_time')
         kwargs['date_archive'] = Article.objects.archive()
         kwargs['tag_list'] = Article.objects.filter(category=self.kwargs['cate_id'], status='p')\
-            .values('tag__id', 'tag__name','created_time').order_by('created_time')
+            .values('tag__id', 'tag__name', 'created_time').order_by('created_time')
         return super(CategoryView, self).get_context_data(**kwargs)
 
 
 class TagView(ListView):
+    """
+    Show all files with same tag name.
+    """
+
     template_name = "blog/index_summary.html"
     context_object_name = "article_list"
 

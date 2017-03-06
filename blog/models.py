@@ -5,7 +5,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from collections import defaultdict
-from blog_project import settings
 from tinymce.models import HTMLField
 
 
@@ -39,6 +38,10 @@ class Location(models.Model):
     provence = ('北京','天津','上海','重庆',)
 
 class UserProfile(models.Model):
+    """
+    User profile class.
+    """
+
     user = models.OneToOneField(User, unique=True, verbose_name=('用户'))
     photo = models.ImageField("头像", width_field=100, height_field=120, null=True)
     mobile_phone = models.CharField('移动电话', max_length=20, null=True)
@@ -63,6 +66,10 @@ class ArticleManage(models.Manager):
 
 
 class Article(models.Model):
+    """
+    DB model of article table.
+    """
+
     STATUS_CHOICES = (
         ('d', 'Draft'),
         ('p', 'Published'),
@@ -75,20 +82,22 @@ class Article(models.Model):
     created_time = models.DateTimeField('创建时间', auto_now_add=True)
     last_modified_time = models.DateTimeField('修改时间', auto_now=True)
     status = models.CharField('文章状态', max_length=1, choices=STATUS_CHOICES)
-    abstract = models.TextField('摘要', max_length=1000, blank=True, 
+    abstract = models.TextField('摘要', max_length=1000, blank=True, \
         null=True, help_text="可选，如若为空将摘取正文的前1000个字符")
-    keywords = models.CharField("关键字", max_length=100, blank=True, 
+    keywords = models.CharField("关键字", max_length=100, blank=True, \
         help_text="关键字之间以逗号（,）分隔")
-    en_keywords = models.CharField("Key Words", max_length=100, blank=True, help_text="关键字之间以英文逗号（,）分隔")
+    en_keywords = models.CharField("Key Words", max_length=100, blank=True, \
+        help_text="关键字之间以英文逗号（,）分隔")
     views = models.PositiveIntegerField('浏览量', default=0, editable=False)
     likes = models.PositiveIntegerField('点赞数', default=0, editable=False)
     topped = models.BooleanField('置顶', default=False)
-    price = models.DecimalField('价格', default=1, blank=False, 
+    price = models.DecimalField('价格', default=1, blank=False, \
         decimal_places=2, max_digits=6, help_text="文档价格，单位：元")
-    attachment = models.ForeignKey('Attachment', verbose_name='附件', 
+    attachment = models.ForeignKey('Attachment', verbose_name='附件', \
         null=True, on_delete=models.SET_NULL)
-    category = models.ForeignKey('Category', verbose_name='分类', null=True, on_delete=models.SET_NULL)
-    tag = models.ForeignKey('Tag', verbose_name='标签集合', null=True, 
+    category = models.ForeignKey('Category', verbose_name='分类', null=True, \
+        on_delete=models.SET_NULL)
+    tag = models.ForeignKey('Tag', verbose_name='标签集合', null=True, \
         blank=True)
     user = models.OneToOneField('UserProfile', editable=False, null=True, 
         blank=True)
@@ -101,12 +110,11 @@ class Article(models.Model):
         verbose_name_plural = verbose_name
         ordering = ['-last_modified_time']
 
-    # 第五周：新增 get_absolute_url 方法
     def get_absolute_url(self):
         return reverse('blog:detail', kwargs={'article_id': self.pk}) 
 
 class Attachment(models.Model):
-    """文章附件"""
+    """DB model of article attachment."""
     name = models.CharField('附件名', max_length=120)
     upload_time = models.DateTimeField('上传时间', auto_now_add=True)
     download_times = models.PositiveIntegerField('下载次数', default=0, editable=False)
@@ -117,6 +125,10 @@ class Attachment(models.Model):
 
 
 class Category(models.Model):
+    """
+    DB model of article category.
+    """
+
     DISPLAY_MODE = (
         ('l', 'List'),
         ('D', 'Detail'),
@@ -148,7 +160,6 @@ class Tag(models.Model):
         verbose_name_plural = verbose_name
 
 
-# # 第五周：新增评论
 class BlogComment(models.Model):
     user_name = models.CharField('评论者名字', max_length=100)
     user_email = models.EmailField('评论者邮箱', max_length=255)

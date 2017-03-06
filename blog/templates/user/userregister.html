@@ -5,7 +5,7 @@
 <div class="pcheader">
 	<div class="headerbox">
         <a href="{% url 'blog:index' %}" class="newyxklogo">
-            <em>护理知识共享平台</em>
+            <em>{{ WebSiteName }}</em>
         </a>
         <div class="bannerbtn">
             <a href="/">首页</a>
@@ -23,79 +23,96 @@
 
 {% block content %}
     <script type="text/javascript">
+        var pwdLength = 8;
 
-    function validateUserName(obj){
-        var userError = $("#userError");
-        if($(obj).val().length <= 0){
-            $('#userMsg').val('用户名不能为空');
-            userError.show();
-            $('#memUserValication').hide();
-            return;
+        function checkUserName(){
+            var reg = /^[0-9a-zA-Z]+$/
+            var str = $("#memUserId").val();
+            if(!reg.test(str)){
+                return false;
+            }
+
+            if(str.length <6 || str.length >12){
+                return false;
+            }
+
+            return true;
         }
 
-        $.get("/ValidateUserName", { 'name': obj.value },
-            function(data){
-                if(data != '1'){
-                    $('#userMsg').text(data);
-                    userError.show();
-                    $('#memUserValication').hide();
-                    return false;
-                }else{
-                    $('#memUserValication').show();
-                }
-            });
-    }
+        function validateUserName(){
+            var userError = $("#userError");
+            if(!checkUserName($("#memUserId"))){
+                $('#userMsg').text('用户名不能为空且为大于等于6位，小于等于12位的字母、数字组合');
+                userError.show();
+                $('#memUserValication').hide();
+                return;
+            }
 
-    function changUserName(obj){
-        if(obj.value.length > 0){
-            var userError = $("#userError")
-            userError.hide()
+            $.get("/ValidateUserName", { 'name': $("#memUserId").val() },
+                function(data){
+                    if(data != '1'){
+                        $('#userMsg').text(data);
+                        userError.show();
+                        $('#memUserValication').hide();
+                        return false;
+                    }else{
+                        $('#memUserValication').show();
+                    }
+                });
         }
-    }
+
+        function changUserName(){
+            if(checkUserName()){
+                var userError = $("#userError")
+                userError.hide()
+            }
+        }
     
-    function changPsw(obj) {
-        if(obj.value.length > 0){
+        function changPsw() {
             var pswError = $("#pswError")
-            pswError.hide()
+            if(($("#memPassword").val().length >= pwdLength) && ($("#memPassword").val().length <= 20)){
+                pswError.hide()
+                return true;
+            }else{
+                $("#pswMsg").text("密码长度必须大于：" + pwdLength + ", 小于： 20。");
+                pswError.show();
+                return false;
+            }
         }
-    }
 
-    function changPswConfirm(obj) {
-        if(obj.value.length > 0){
+        function changPswConfirm() {
+            if(!changPsw()){
+                return false;
+            }
+
             var pswConfirmError = $("#pswConfirmError")
-            pswConfirmError.hide()
-        }
-    }
-
-    function  VerifyRegister() {
-        var userName = $("#memUserId");
-        if(userName.val().length <= 0)
-        {
-            userName.focus();
-            var userError = $("#userError")
-            $('#userMsg').text('用户名不能为空');
-            userError.show();
-            return false;
+            if($("#memPassword").val() == $("#password_confirm").val()){
+                pswConfirmError.hide()
+                return true;
+            }else{
+                $("#pswMsgConfirm").text("两次输入的密码不一致。");
+                pswConfirmError.show();
+                return false;
+            }
         }
 
-        var memPassword = $('#memPassword');
-        var password_confirm = $('#password_confirm');
-        var pswMsg = $("#pswMsg")
-        if(memPassword.val().length <= 0)
-        {
-            memPassword.focus();
-            pswMsg.val('密码不能为空');
-            $('#pswError').show();
+        function  VerifyRegister() {
+            var userName = $("#memUserId");
+            if(!checkUserName(userName))
+            {
+                userName.focus();
+                var userError = $("#userError")
+                $('#userMsg').text('用户名不能为空且为大于等于6位，小于等于12位的字母、数字组合');
+                userError.show();
+                return false;
+            }
+
+            if(changPswConfirm()){
+                $("form").submit();
+            }
+
             return false;
         }
-        if(memPassword.val() !== password_confirm.val())
-        {
-            $("#pswMsgConfirm").val('密码不一致');
-            $("#pswConfirmError").show();
-            return false;
-        }
-        return true;
-    }
     </script>
 <link rel="stylesheet" href="{% static 'blog/css/login.css' %}">
 <div class="center" style="height: 439px;">
@@ -110,35 +127,33 @@
                 <div class="needtext">
                     <div class="input-id">
                         <span id="idnumber"></span>
-                        <input type="text" id="memUserId" name="memUserId" value="" placeholder="手机/邮箱" onkeyup="changUserName(this)" onblur="validateUserName(this)">
+                        <input type="text" id="memUserId" name="memUserId" value="" placeholder="6-12位字母、数字组合" onchange="changUserName()" onblur="validateUserName()">
                         <span id="memUserValication" style="color: green; display: none; background: none;">OK</span>
                         <div class="clear"></div>
-                        <!--提示框-->
                         <div class="tipsboxalert" id="userError" style="display: none;">
                             <em></em>
-                            <p id="userMsg">用户名不能为空</p>
+                            <p id="userMsg"></p>
                         </div>
                     </div>
                     <div class="input-pas">
                         <span id="idpass"></span>
-                        <input type="password" id="memPassword" name="memPassword" placeholder="密码" onkeyup="changPsw(this)">
-                        <input type="hidden" id="jiamiPassword" name="jiamiPassword">
+                        <input type="password" id="memPassword" name="memPassword" placeholder="密码" onchange="changPsw()">
                         <div class="clear"></div>
                         <div class="tipsboxalert" id="pswError" style="display: none;">
                             <em></em>
-                            <p id="pswMsg">密码不能为空</p>
+                            <p id="pswMsg"></p>
                         </div>
                     </div>
                     <div class="input-pas">
                         <span id="idpass"></span>
-                        <input type="password" id="password_confirm" name="memPassword" placeholder="确认密码" onkeyup="changPswConfirm(this)">
+                        <input type="password" id="password_confirm" name="password_confirm" placeholder="确认密码" onchange="changPswConfirm()">
                         <div class="clear"></div>
                         <div class="tipsboxalert" id="pswConfirmError" style="display: none;">
                             <em></em>
-                            <p id="pswMsgConfirm">密码不一致</p>
+                            <p id="pswMsgConfirm"></p>
                         </div>
                     </div>
-                    <input type="submit" id="mregister" value="注册" class="tjbtn-login nodjsbtn" onclick="return VerifyRegister()">
+                    <input id="mregister" value="注册" class="tjbtn-login nodjsbtn" onclick="VerifyRegister()">
                 </div>
             </form>
         </div>
