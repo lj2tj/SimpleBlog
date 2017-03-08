@@ -15,9 +15,10 @@ urlpatterns = [
     url(r'^about$', views.About.as_view(), name='about'),
     url(r'^usercenter$', viewUser.UserCenter, name='usercenter'),
     url(r'^ValidateUserName$', viewUser.ValidateUserName, name='ValidateUserName'),
-    url(r'^RegisterPage$', viewUser.RegisterPage, name='RegisterPage'),
+    url(r'^RegisterPage$', viewUser.registerPage, name='RegisterPage'),
     url(r'^register$', viewUser.register, name='register'),
-    url(r'^login$', viewUser.login, name='login'),
-    url(r'^LoginPage$', viewUser.LoginPage, name='LoginPage'),
+    url(r'^[Ll][Oo][Gg][Ii][Nn]$', viewUser.login, name='login'),
+    url(r'^[Ll][Oo][Gg][Oo][Uu][Tt]$', viewUser.logout, name='logout'),
+    url(r'^[Ll][Oo][Gg][Ii][Nn][Pp][Aa][Gg][Ee]$', viewUser.loginPage, name='LoginPage'),
     url(r'^purchase/(?P<article_id>\d+)$', login_required(viewUser.Purchase), name='purchase'),
 ]

@@ -28,10 +28,9 @@
             <a href="{% url 'blog:about' %}">关于</a>
             <div class="nw-line" style="display: none;"></div>
         </div>
-        <!--登录注册-->
         {% if request.user.username != "" %}
             <div class="registerlogin" >
-                <a href="admin/logout"><span class="pc-register">退出</span></a>
+                <a href="{% url 'blog:logout' %}"><span class="pc-register">退出</span></a>
                 <a href="{% url 'blog:usercenter' %}"><span class="loginiocn">{{ request.user.username }}</span></a>
             </div>
         {% else %}

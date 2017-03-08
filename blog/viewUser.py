@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 #coding=utf-8
 
+from datetime import datetime
 from django.shortcuts import render, get_object_or_404, HttpResponseRedirect, render_to_response
 from django.template import RequestContext, loader
 from django.contrib import auth
@@ -30,11 +31,12 @@ def ValidateUserName(request):
         else:
             return HttpResponse('User [%s] already exists' % name)
 
-def RegisterPage(request):
+def registerPage(request):
     """
     Show user register page.
     """
-    return render_to_response("user/userregister.html", RequestContext(request, {"WebSiteName" : WebSiteName}))
+    return render_to_response("user/userregister.html", \
+        RequestContext(request, {"WebSiteName" : WebSiteName}))
 
 
 def register(request):
@@ -47,7 +49,7 @@ def register(request):
         don't need to register a new one, \
         go to user center directly.
         """
-        return HttpResponseRedirect("/usercenter")
+        return HttpResponseRedirect("usercenter")
 
     errors = []
     try:
@@ -55,30 +57,36 @@ def register(request):
             username = request.POST.get('memUserId', '')
             password1 = request.POST.get('memPassword', '')
             password_confirm = request.POST.get('password_confirm', '')
-
             if password1 != password_confirm:
                 errors.append("两次输入的密码不一致!")
                 return render_to_response("/", \
                     RequestContext(request, {'memUserId': username, 'errors': errors}))
-            if UserProfile.objects.filter(username=username):
+            if User.objects.filter(username=username):
                 errors.append("该用户名已存在!")
                 return render_to_response("/", \
                    RequestContext(request, {'memUserId': username, 'errors': errors}))
-            user = UserProfile()
+            user = User()
             user.username = username
-            user.password = password1
+            user.set_password(password1)
+            user.is_staff = 1
             user.save()
 
-        return render_to_response("/")
+        user = auth.authenticate(username=username, password=password1)
+        auth.login(request, user)
+        return render_to_response("user/usercenter.html", RequestContext(request))
 
     except Exception, e:
         errors.append(str(e))
-        return render_to_response("user/userregister.html", 
+        return render_to_response("user/userregister.html", \
             RequestContext(request, {'memUserId': '', 'errors': errors}))
 
 
-def LoginPage(request):
-    return render_to_response("user/login.html", RequestContext(request, {"WebSiteName" : WebSiteName}))
+def loginPage(request):
+    """
+    User login page.
+    """
+    return render_to_response("user/login.html", \
+        RequestContext(request, {"WebSiteName" : WebSiteName}))
 
 
 def login(request):
@@ -86,20 +94,25 @@ def login(request):
     Customer login.
     """
     if request.user.is_authenticated():
-        return HttpResponseRedirect("/usercenter")
+        return HttpResponseRedirect("usercenter")
     else:
         if request.method == 'POST':
-            username = request.POST.get('name', '')
-            password = request.POST.get('password', '')
+            username = request.POST.get('memUserId', '')
+            password = request.POST.get('memPassword', '')
+            print username, password
             user = auth.authenticate(username=username, password=password)
             if user and user.is_active:
                 auth.login(request, user)
-                return HttpResponseRedirect("/usercenter")
+                return HttpResponseRedirect("usercenter")
 
-        return render_to_response("user/login.html", RequestContext(request, {'curtime': datetime.now()}))
+        return render_to_response("user/login.html", \
+            RequestContext(request, {'curtime': datetime.now()}))
 
 
 def UserCenter(request):
+    """
+    Website user center.
+    """
     if not request.user.is_authenticated():
         return render_to_response("user/login.html", RequestContext(request))
 
@@ -112,7 +125,8 @@ def Purchase(request):
     """
     article_id = '-1'
     if not request.user.is_authenticated():
-        return render_to_response("user/login.html", RequestContext(request, {'purchase':True, 'article_id': article_id}))
+        return render_to_response("user/login.html", \
+            RequestContext(request, {'purchase':True, 'article_id': article_id}))
     else:
         if request.method == 'GET':
             article_id = request.GET.get('article_id', '-1')
@@ -137,12 +151,21 @@ def Purchase(request):
     return response
 
 
+def logout(request):
+    """
+    Logout website.
+    """
+    auth.logout(request)
+    return HttpResponseRedirect("/")
+
+
+
 def file_iterator(file_name, chunk_size=512):
     """File downloader"""
-    with open(file_name) as f:
+    with open(file_name) as new_file:
         while True:
-            c = f.read(chunk_size)
-            if c:
-                yield c
+            block = new_file.read(chunk_size)
+            if block:
+                yield block
             else:
                 break

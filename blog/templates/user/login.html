@@ -29,7 +29,7 @@
             <img src="{% static 'blog/img/pc-leftppic.png' %}">
         </div>
         <div class="loginbox">
-            <form name="loginForm" method="post">
+            <form name="loginForm" method="post" action="{% url 'blog:login' %}">
                 {% csrf_token %}
                 <div class="userphoto" id="userphoto"><img src="{% static 'blog/img/user_default.svg' %}"></div>
                 <div class="needtext">
@@ -37,7 +37,6 @@
                         <span id="idnumber"></span>
                         <input type="text" id="memUserId" name="memUserId" value="" placeholder="手机/邮箱">
                         <div class="clear"></div>
-                        <!--提示框-->
                         <div class="tipsboxalert" id="userError" style="display: none;">
                             <em></em>
                             <p id="userMsg">用户名不能为空</p>
