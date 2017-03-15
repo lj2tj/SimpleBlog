@@ -9,7 +9,9 @@ from tinymce.models import HTMLField
 
 
 class WebSiteLevel(models.Model):
-    """User level, used for purchase discount"""
+    """
+    User level, used for purchase discount.
+    """
     LEVEL_CHOICES = (
         ('A', 'Basic'),
         ('B', 'Nomal'),
@@ -20,6 +22,9 @@ class WebSiteLevel(models.Model):
     description = models.CharField('说明', max_length=200, null=True)
 
 class JobPosition(models.Model):
+    """
+    Job position.
+    """
     job_title = models.CharField('职务', max_length=20)
 
     class Meta:
@@ -27,6 +32,9 @@ class JobPosition(models.Model):
         verbose_name_plural = verbose_name
 
 class JobTitle(models.Model):
+    """
+    Job title.
+    """
     job_title = models.CharField('职称', max_length=20)
 
     class Meta:
@@ -34,6 +42,9 @@ class JobTitle(models.Model):
         verbose_name_plural = verbose_name
 
 class Location(models.Model):
+    """
+    Geography location.
+    """
     country = ('中国', '其它',)
     provence = ('北京','天津','上海','重庆',)
 

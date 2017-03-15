@@ -11,15 +11,34 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, FormView
 from blog.models import UserProfile, BlogComment, AppSettings
+from blog.models import Article, Attachment, Category, Tag, UserProfile
 from django.http import StreamingHttpResponse, HttpResponse
 
 
 WebSiteName = AppSettings.objects.filter(name='WebSiteName')[0].value
 
+def UpdateUserInfo(request):
+    """
+    Update user info.
+    """
+    if not request.user.is_authenticated():
+        return render_to_response("user/login.html", \
+        RequestContext(request, {"WebSiteName" : WebSiteName}))
+
+    user_id = request.user.id
+    user = User.objects.filter(id=user_id)
+    email = request.POST.get('email', '')
+    if email.find("@") <= 0:
+        return HttpResponse("邮箱地址不正确")
+    else:
+        user.email = email
+        user.save()
+        return HttpResponse("1")
+
 def ValidateUserName(request):
     """
-    Validate if an user already exists, when registering a new user, if the user name already exists,
-    return alert message, if it is a new user, retuan 1.
+    Validate if an user already exists when registering a new user,
+    if yes return alert message, else retuan 1.
     """
     name = request.GET.get('name', '')
     if name == '':
@@ -30,6 +49,7 @@ def ValidateUserName(request):
             return HttpResponse('1')
         else:
             return HttpResponse('User [%s] already exists' % name)
+
 
 def registerPage(request):
     """
@@ -115,8 +135,11 @@ def UserCenter(request):
     """
     if not request.user.is_authenticated():
         return render_to_response("user/login.html", RequestContext(request))
-
-    return render_to_response("user/usercenter.html", RequestContext(request))
+    base_info = request.user
+    print base_info
+    category_list = Category.objects.all().order_by('created_time')
+    return render_to_response("user/usercenter.html", \
+    RequestContext(request, {'category_list':category_list, 'base_info': base_info}))
 
 
 def Purchase(request):
