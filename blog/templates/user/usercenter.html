@@ -1,31 +1,78 @@
 {% extends 'base.html' %}
-{% block content %}
 {% load staticfiles %}
+{% block content %}
 
+<link rel="stylesheet" href="{% static 'blog/css/user_center.css' %}">
+
+<script type="text/javascript">
+    function saveEmail(){
+        var newEmail = $('#email').val();
+        if(newEmail.indexOf('@') <= 0){
+            $('#email').focus();
+            $('#emailError').show();
+            $('#emailMsg').text("邮箱地址不正确");
+            return false;
+        }
+
+        $.post("/UpdateUserInfo",{email:newEmail},function(result){
+            $('#emailError').show();
+            $("#emailMsg").text(result);
+        });
+    }
+</script>
 
 <div class="personalinfo">
 	<div class="briefleftbox">
-    	<div class="briefpic"><span><img src="https://ucenter.cn-healthcare.com/static/images/photo_def_max.jpg"></span></div>
+    	<div class="briefpic"><span><img src="{% static 'blog/img/default_user_big.jpg' %}"></span></div>
         <div class="briefwit">
         	<h4>
 			{{ request.user.username }}			<span class="{{ request.userprofile.website_level }}"></span>
 			</h4>
         </div>
-        <div class="clear"></div>
+    </div>
+    <em></em>
+    <div class="integralbox integralboxtop">
+    	<ul> 
+        	<li>我的邮箱：
+                {% if base_info.email = "" %}
+                <div id="EmailInput">
+                    <input id="email" type="email" placeholder="sample@test.com">
+                    <input type="button" value="保存" onclick="saveEmail()" />
+                    <div class="tipsboxalert" id="emailError" style="display: none;">
+                        <p id="emailMsg"></p>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+                {% else %}
+                    <b>{{ base_info.email }}</b>
+                {% endif %}
+            </li>
+            <li>最近登录：<b>{{ base_info.last_login }}</b></li>
+            <li>我的消费：<b>{{base_info}}</b></li>
+            <li>我的头衔：<i>蜻蜓点水</i></li>
+        </ul>
+    </div>
+    <em></em>
+    <div class="integralbox integralboxtop">
+    	<ul>
+        	<li>我的上传：篇</li>
+            <li>我的下载：篇</li>
+            <li>我的购买：篇</li>
+            <li>我的收藏：篇</li>
+        </ul>
     </div>
     <div class="clear"></div>
 </div>
 
-<p>基本信息</p>
-
 <div class="personal">
     <div class="personalleft" id="personalleft" style="height: 514px;">
-        <ul class="nav nav-pills nav-stacked">
-		  <li class="active"><a href="#">>我的上传：篇</a></li>
-		  <li><a href="#">我的下载：篇</a></li>
-		  <li><a href="#">我的购买：篇</a></li>
-		  <li><a href="#">我的收藏：篇</a></li>
-		</ul>
+        <div class="listbox">
+            <a href="#jbxx" class="on">基本信息</a>
+            <a href="#wdsc">我的上传：篇</a>
+            <a href="#wdgm">我的购买：篇</a>
+            <a href="#wdxz">我的下载：篇</a>
+            <a href="#wdscang">我的收藏：篇</a>
+        </div>
     </div>
     <div class="personalright" id="personalright">
 
