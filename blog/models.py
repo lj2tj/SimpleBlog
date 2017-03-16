@@ -8,6 +8,20 @@ from collections import defaultdict
 from tinymce.models import HTMLField
 
 
+class TradeMode(models.Model):
+    """
+    Trade mode when user buying an article.
+    """
+    TRADE_CHOICES = (
+        ('WeChat', '微信'),
+        ('ZhiFuBao', '支付宝'),
+        ('Bank', '银行转账'),
+        ('Other', '其它'),
+    )
+    mode = models.CharField('交易方式', max_length=20, choices=TRADE_CHOICES)
+    description = models.CharField('说明', max_length=200, null=True)
+
+
 class WebSiteLevel(models.Model):
     """
     User level, used for purchase discount.
@@ -25,6 +39,7 @@ class JobPosition(models.Model):
     """
     Job position.
     """
+
     job_title = models.CharField('职务', max_length=20)
 
     class Meta:
@@ -35,6 +50,7 @@ class JobTitle(models.Model):
     """
     Job title.
     """
+
     job_title = models.CharField('职称', max_length=20)
 
     class Meta:
@@ -45,8 +61,9 @@ class Location(models.Model):
     """
     Geography location.
     """
+
     country = ('中国', '其它',)
-    provence = ('北京','天津','上海','重庆',)
+    provence = ('北京', '天津', '上海', '重庆',)
 
 class UserProfile(models.Model):
     """
@@ -66,8 +83,26 @@ class UserProfile(models.Model):
         verbose_name_plural = verbose_name
 
 
-# Create your models here.
+class UserDownloadFile(models.Model):
+    """
+    User downloaded files.
+    """
+
+    user = models.ForeignKey(User, verbose_name=('用户'))
+    article = models.ForeignKey('Article', verbose_name='文章', on_delete=models.CASCADE)
+    origin_price = models.DecimalField('原始价格', default=1, blank=False, \
+        decimal_places=2, max_digits=6, help_text="原始价格，单位：元")
+    deal_price = models.DecimalField('下单价格', default=1, blank=False, \
+        decimal_places=2, max_digits=6, help_text="下单价格，单位：元")
+    download_time = models.DateTimeField('交易时间', auto_now_add=True)
+    trade_mode = models.ForeignKey('TradeMode', verbose_name='交易方式')
+
+
 class ArticleManage(models.Manager):
+    """
+    Article management class.
+    """
+
     def archive(self):
         date_list = Article.objects.datetimes('created_time', 'month', order='DESC')
         date_dict = defaultdict(list)
@@ -110,8 +145,7 @@ class Article(models.Model):
         on_delete=models.SET_NULL)
     tag = models.ForeignKey('Tag', verbose_name='标签集合', null=True, \
         blank=True)
-    user = models.OneToOneField('UserProfile', editable=False, null=True, 
-        blank=True)
+    user = models.ForeignKey(User, editable=False, null=True, blank=True)
 
     def __str__(self):
         return self.title
@@ -125,7 +159,9 @@ class Article(models.Model):
         return reverse('blog:detail', kwargs={'article_id': self.pk}) 
 
 class Attachment(models.Model):
-    """DB model of article attachment."""
+    """
+    DB model of article attachment.
+    """
     name = models.CharField('附件名', max_length=120)
     upload_time = models.DateTimeField('上传时间', auto_now_add=True)
     download_times = models.PositiveIntegerField('下载次数', default=0, editable=False)
@@ -159,6 +195,10 @@ class Category(models.Model):
 
 
 class Tag(models.Model):
+    """
+    Article tag.
+    """
+
     name = models.CharField('标签名', max_length=20)
     created_time = models.DateTimeField('创建时间', auto_now_add=True)
     last_modified_time = models.DateTimeField('修改时间', auto_now=True)
@@ -172,6 +212,10 @@ class Tag(models.Model):
 
 
 class BlogComment(models.Model):
+    """
+    Article (blog) comment.
+    """
+
     user_name = models.CharField('评论者名字', max_length=100)
     user_email = models.EmailField('评论者邮箱', max_length=255)
     body = HTMLField('评论内容')

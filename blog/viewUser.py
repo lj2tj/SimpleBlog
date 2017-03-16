@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, FormView
-from blog.models import UserProfile, BlogComment, AppSettings
+from blog.models import UserProfile, UserDownloadFile, BlogComment, AppSettings
 from blog.models import Article, Attachment, Category, Tag, UserProfile
 from django.http import StreamingHttpResponse, HttpResponse
 
@@ -25,14 +25,13 @@ def UpdateUserInfo(request):
         return render_to_response("user/login.html", \
         RequestContext(request, {"WebSiteName" : WebSiteName}))
 
-    user_id = request.user.id
-    user = User.objects.filter(id=user_id)
-    email = request.POST.get('email', '')
+    current_user = User.objects.filter(id=request.user.id)
+    email = request.GET.get('email', '')
     if email.find("@") <= 0:
         return HttpResponse("邮箱地址不正确")
     else:
-        user.email = email
-        user.save()
+        current_user.email = email
+        current_user.save()
         return HttpResponse("1")
 
 def ValidateUserName(request):
@@ -119,7 +118,6 @@ def login(request):
         if request.method == 'POST':
             username = request.POST.get('memUserId', '')
             password = request.POST.get('memPassword', '')
-            print username, password
             user = auth.authenticate(username=username, password=password)
             if user and user.is_active:
                 auth.login(request, user)
@@ -136,10 +134,20 @@ def UserCenter(request):
     if not request.user.is_authenticated():
         return render_to_response("user/login.html", RequestContext(request))
     base_info = request.user
-    print base_info
+
     category_list = Category.objects.all().order_by('created_time')
-    return render_to_response("user/usercenter.html", \
-    RequestContext(request, {'category_list':category_list, 'base_info': base_info}))
+    uploaded_files = Article.objects.filter(user_id=base_info.id)
+    if not any(uploaded_files):
+        uploaded_files = []
+
+    downloaded_files = UserDownloadFile.objects.filter(user_id=base_info.id)
+    if not any(downloaded_files):
+        downloaded_files = []
+    
+    dic = {'category_list':category_list, \
+    'base_info': base_info, 'uploaded_files': uploaded_files, \
+    'downloaded_files': downloaded_files}
+    return render(request, "user/usercenter.html", dic)
 
 
 def Purchase(request):

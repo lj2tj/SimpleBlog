@@ -5,6 +5,15 @@
 <link rel="stylesheet" href="{% static 'blog/css/user_center.css' %}">
 
 <script type="text/javascript">
+
+    // Press Enter in email textbox will trigger save event.
+    function trySaveEmail(){
+        var lKeyCode = (navigator.appname=="Netscape")?event.which:window.event.keyCode;
+        if (lKeyCode == 13){
+            saveEmail();
+        }
+    }
+
     function saveEmail(){
         var newEmail = $('#email').val();
         if(newEmail.indexOf('@') <= 0){
@@ -14,10 +23,15 @@
             return false;
         }
 
-        $.post("/UpdateUserInfo",{email:newEmail},function(result){
-            $('#emailError').show();
-            $("#emailMsg").text(result);
-        });
+        $.get("/UpdateUserInfo", {'email':newEmail}, 
+            function(result){
+                $('#emailError').show();
+                $("#emailMsg").text(result);
+                alert(result);
+            }, 
+            function(err){
+                alert(err)
+            });
     }
 </script>
 
@@ -36,7 +50,7 @@
         	<li>我的邮箱：
                 {% if base_info.email = "" %}
                 <div id="EmailInput">
-                    <input id="email" type="email" placeholder="sample@test.com">
+                    <input id="email" type="email" placeholder="sample@test.com" onkeydown="trySaveEmail()">
                     <input type="button" value="保存" onclick="saveEmail()" />
                     <div class="tipsboxalert" id="emailError" style="display: none;">
                         <p id="emailMsg"></p>
@@ -48,17 +62,17 @@
                 {% endif %}
             </li>
             <li>最近登录：<b>{{ base_info.last_login }}</b></li>
-            <li>我的消费：<b>{{base_info}}</b></li>
+            <li>我的消费：<b>{{ base_info }}</b></li>
             <li>我的头衔：<i>蜻蜓点水</i></li>
         </ul>
     </div>
     <em></em>
     <div class="integralbox integralboxtop">
     	<ul>
-        	<li>我的上传：篇</li>
-            <li>我的下载：篇</li>
-            <li>我的购买：篇</li>
+        	<li>我的上传：{{ uploaded_files | length }} 篇</li>
+            <li>我的下载：{{ downloaded_files | length }} 篇</li>
             <li>我的收藏：篇</li>
+            <li>我的转发：篇</li>
         </ul>
     </div>
     <div class="clear"></div>
