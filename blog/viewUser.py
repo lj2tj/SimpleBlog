@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 #coding=utf-8
 
+import os
 from datetime import datetime
 from django.shortcuts import render, get_object_or_404, HttpResponseRedirect, render_to_response
 from django.template import RequestContext, loader
+from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
@@ -143,42 +145,38 @@ def UserCenter(request):
     downloaded_files = UserDownloadFile.objects.filter(user_id=base_info.id)
     if not any(downloaded_files):
         downloaded_files = []
-    
+
     dic = {'category_list':category_list, \
     'base_info': base_info, 'uploaded_files': uploaded_files, \
     'downloaded_files': downloaded_files}
     return render(request, "user/usercenter.html", dic)
 
 
-def Purchase(request):
+def Purchase(request, attachment_id):
     """
     By a document.
     """
-    article_id = '-1'
     if not request.user.is_authenticated():
         return render_to_response("user/login.html", \
-            RequestContext(request, {'purchase':True, 'article_id': article_id}))
-    else:
-        if request.method == 'GET':
-            article_id = request.GET.get('article_id', '-1')
-        else:
-            article_id = -1
+            RequestContext(request, {'purchase':True, 'attachment_id': attachment_id}))
 
-    if article_id == -1:
+    if attachment_id == -1:
         return HttpResponse('No such file.')
 
-    the_file_name = Article.objects.filter(id=article_id)
-    if the_file_name == None:
-        """TODO : Could not find the file"""
+    upload_file_path = settings.MEDIA_ROOT
+
+    if upload_file_path is None:
+        return HttpResponse('System setting error, upload_file_path is empty.')
+
+    the_file = Attachment.objects.filter(id=attachment_id)
+    if the_file is None:
         return HttpResponse('No such file.')
 
-    UploadFilePath = AppSettings.objects.filter(name='UploadFilePath')
-    if UploadFilePath == null:
-        return HttpResponse('System setting error, UploadFilePath is empty.')
-
-    response = StreamingHttpResponse(file_iterator(os.path.join(UploadFilePath, the_file_name)))
+    file_full_name = os.path.join(upload_file_path, unicode(the_file[0].attachment))
+    print 'file_full_name', file_full_name
+    response = StreamingHttpResponse(file_iterator(file_full_name))
     response['Content-Type'] = 'application/octet-stream'
-    response['Content-Disposition'] = 'attachment;filename="{0}"'.format(the_file_name)
+    response['Content-Disposition'] = 'attachment;filename="{0}"'.format(the_file[0].name)
     return response
 
 

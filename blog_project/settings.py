@@ -88,7 +88,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': "MyBlog",
         'USER': 'root',
-        'PASSWORD': '123456'
+        'PASSWORD': '123456',
+        'DEFAULT_CHARSET': 'utf8',
+        'COLLATION': 'utf8_general_ci',
     }
 }
 
@@ -139,4 +141,8 @@ TINYMCE_DEFAULT_CONFIG = {
 }
 
 LOGIN_URL = '/login'
-LOGIN_REDIRECT_URL='/'
+LOGIN_REDIRECT_URL = '/'
+
+# File upload settings
+MEDIA_ROOT = r'D:\FileUploadFolder'
+MEDIA_URL = '/fileupload/'

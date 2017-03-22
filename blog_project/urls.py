@@ -20,14 +20,14 @@ Including another URLconf
 import sys
 from django.conf import settings
 from django.conf.urls.static import static
-
-reload(sys)
-sys.setdefaultencoding('utf-8')
 from django.conf.urls import url, include
 from django.contrib import admin
 
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 urlpatterns = [
-    url(r'^admin/', admin.site.urls),
+    url(r'^(?i)admin/', admin.site.urls),
     url(r'', include('blog.urls', namespace='blog', app_name='blog')),
-    url(r'^tinymce/', include('tinymce.urls')),
-] + static(settings.STATIC_URL, document_root = settings.STATIC_ROOT)
+    url(r'^(?i)tinymce/', include('tinymce.urls')),
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

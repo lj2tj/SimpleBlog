@@ -108,7 +108,7 @@ class ArticleManage(models.Manager):
         date_dict = defaultdict(list)
         for d in date_list:
             date_dict[d.year].append(d.month)
-        return sorted(date_dict.items(), reverse=True)  # 模板不支持defaultdict
+        return sorted(date_dict.items(), reverse=True)
 
 
 class Article(models.Model):
@@ -156,15 +156,24 @@ class Article(models.Model):
         ordering = ['-last_modified_time']
 
     def get_absolute_url(self):
-        return reverse('blog:detail', kwargs={'article_id': self.pk}) 
+        """
+        Get absolute url of article pages.
+        """
+
+        return reverse('blog:detail', kwargs={'article_id': self.pk})
 
 class Attachment(models.Model):
     """
     DB model of article attachment.
     """
+
     name = models.CharField('附件名', max_length=120)
+    attachment = models.FileField('附件', upload_to='Articles')
     upload_time = models.DateTimeField('上传时间', auto_now_add=True)
     download_times = models.PositiveIntegerField('下载次数', default=0, editable=False)
+
+    def __str__(self):
+        return self.name
 
     class Meta:
         verbose_name = "附件"

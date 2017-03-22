@@ -149,7 +149,7 @@ class CommentPostView(FormView):
     """
     Comment post view.
     """
-    
+
     form_class = BlogCommentForm
     template_name = 'blog/detail.html'
 
