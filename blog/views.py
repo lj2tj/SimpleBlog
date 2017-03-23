@@ -15,7 +15,9 @@ from .models import BlogComment, AppSettings
 from .forms import CustomeLoginForm, BlogCommentForm, ArticleEditForm
 from django.http import StreamingHttpResponse, HttpResponse, request
 
-WebSiteName = AppSettings.objects.filter(name='WebSiteName')[0].value
+WebSiteName = ''
+if AppSettings.objects.filter(name='WebSiteName') is not None:
+    WebSiteName = AppSettings.objects.filter(name='WebSiteName')[0].value
 
 class About(ListView):
     """

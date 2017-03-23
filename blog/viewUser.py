@@ -16,25 +16,32 @@ from blog.models import UserProfile, UserDownloadFile, BlogComment, AppSettings
 from blog.models import Article, Attachment, Category, Tag, UserProfile
 from django.http import StreamingHttpResponse, HttpResponse
 
-
-WebSiteName = AppSettings.objects.filter(name='WebSiteName')[0].value
+WebSiteName = ''
+if AppSettings.objects.filter(name='WebSiteName') is not None:
+    WebSiteName = AppSettings.objects.filter(name='WebSiteName')[0].value
 
 def UpdateUserInfo(request):
     """
     Update user info.
     """
-    if not request.user.is_authenticated():
-        return render_to_response("user/login.html", \
-        RequestContext(request, {"WebSiteName" : WebSiteName}))
+    try:
+        if not request.user.is_authenticated():
+            return render_to_response("user/login.html", \
+            RequestContext(request, {"WebSiteName" : WebSiteName}))
 
-    current_user = User.objects.filter(id=request.user.id)
-    email = request.GET.get('email', '')
-    if email.find("@") <= 0:
-        return HttpResponse("邮箱地址不正确")
-    else:
-        current_user.email = email
-        current_user.save()
+        user = User.objects.filter(id=request.user.id)[0]
+        #user = User(username=current_user.username, password=current_user.password)
+        email = request.GET.get('email', '')
+
+        if email.find("@") <= 0:
+            return HttpResponse("邮箱地址不正确")
+        else:
+            print user.last_login
+            user.email = email
+            user.save()
         return HttpResponse("1")
+    except Exception, e:
+        return HttpResponse(e)
 
 def ValidateUserName(request):
     """
