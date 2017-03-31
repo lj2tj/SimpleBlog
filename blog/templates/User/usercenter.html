@@ -22,16 +22,23 @@
             $('#emailMsg').text("邮箱地址不正确");
             return false;
         }
-
-        $.get("/UpdateUserInfo", {'email':newEmail}, 
-            function(result){
-                $('#emailError').show();
-                $("#emailMsg").text(result);
-                alert(result);
-            }, 
-            function(err){
-                alert(err)
+        
+        $.get("/UpdateUserInfo", { 'email' : newEmail }, function(result){
+                if(result != "1"){
+                    $('#emailError').show();
+                    $("#emailMsg").text(result);
+                }else{
+                    $('#EmailDisplay b').text(newEmail);
+                    $('#EmailInput').hide();
+                    $('#EmailDisplay').show();
+                }
             });
+    }
+
+    function updateEmail(){
+        $('#email').val($('#EmailDisplay b').text())
+        $('#EmailInput').show();
+        $('#EmailDisplay').hide();
     }
 </script>
 
@@ -48,18 +55,27 @@
     <div class="integralbox integralboxtop">
     	<ul> 
         	<li>我的邮箱：
-                {% if base_info.email = "" %}
-                <div id="EmailInput">
-                    <input id="email" type="email" placeholder="sample@test.com" onkeydown="trySaveEmail()">
+                <div id="EmailInput" {% if base_info.email = "" %} 
+                style="display: block;"
+                {% else %}
+                style="display: none;"
+                {% endif %}
+                >
+                    <input id="email" type="email" placeholder="sample@test.com" onkeydown="trySaveEmail()" value="">
                     <input type="button" value="保存" onclick="saveEmail()" />
                     <div class="tipsboxalert" id="emailError" style="display: none;">
                         <p id="emailMsg"></p>
                     </div>
                     <div class="clear"></div>
                 </div>
+                <div id="EmailDisplay" {% if base_info.email = "" %} 
+                style="display: none;"
                 {% else %}
+                style="display: block;"
+                {% endif %}>
                     <b>{{ base_info.email }}</b>
-                {% endif %}
+                    <input type="button" value="修改" onclick="updateEmail()" />
+                </div>
             </li>
             <li>最近登录：<b>{{ base_info.last_login }}</b></li>
             <li>我的消费：<b>{{ base_info }}</b></li>

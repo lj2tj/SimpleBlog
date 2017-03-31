@@ -84,6 +84,68 @@ class ArticleDetailView(DetailView):
         kwargs['form'] = BlogCommentForm()
         return super(ArticleDetailView, self).get_context_data(**kwargs)
 
+def NewArticle(request):
+    """
+    Create new article page.
+    """
+    category_list = Category.objects.all().order_by('created_time')
+    tag_list = Tag.objects.all().order_by('created_time')
+
+    dic = {'category_list':category_list, 'tag_list': tag_list}
+    return render(request, "blog/add_blog.html", dic)
+
+def AddBlog(request):
+    """
+    Add a new blog.
+    """
+    if not request.user.is_authenticated():
+        return render_to_response("user/login.html", RequestContext(request))
+
+    if request.method == 'POST':
+        title = request.POST.get('title', '')
+        body = request.POST.get('body', '')
+        status = request.POST.get('blog_status', '')
+        abstract = request.POST.get('abstract', '')
+        keywords = request.POST.get('keywords', '')
+        en_keywords = request.POST.get('en_keywords', '')
+        topped = request.POST.get('topped', '')
+        price = request.POST.get('price', '')
+        attachment = request.POST.get('attachment', '')
+        category = request.POST.get('category', '')
+        tag = request.POST.get('tag', '')
+
+        myFile = request.FILES.get("attachment", None)
+        if not myFile:
+            return HttpResponse('Please upload file.')
+
+        destination = open(os.path.join(settings.MEDIA_ROOT, myFile.name),'wb+') 
+        for chunk in myFile.chunks(): 
+            destination.write(chunk)  
+        destination.close()
+        
+
+        attachedFile = Attachment()
+        attachedFile.name = myFile.name
+        attachedFile.attachment = myFile.name
+        newFile = attachedFile.save()
+        print newFile
+
+
+        article = Article()
+        article.title = title
+        article.body = body
+        article.status = status
+        article.abstract = abstract
+        article.keywords = keywords
+        article.en_keywords = en_keywords
+        article.topped = topped
+        article.price = price
+        article.attachment = newFile.id
+        article.category = Category.objects.filter(id=category)[0]
+        article.tag = Tag.objects.filter(id=tag)[0]
+        article.save()
+
+        return HttpResponse(article)
 
 class CategoryView(ListView):
     """
