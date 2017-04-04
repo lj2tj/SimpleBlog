@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 #coding=utf-8
 
+import os
 import markdown2
 from datetime import *
 from django.shortcuts import render, get_object_or_404, HttpResponseRedirect, render_to_response
 from django.template import RequestContext, loader
+from django.conf import settings
 from django.contrib import auth
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
@@ -96,7 +98,7 @@ def NewArticle(request):
 
 def AddBlog(request):
     """
-    Add a new blog.
+    Add a new blog.     
     """
     if not request.user.is_authenticated():
         return render_to_response("user/login.html", RequestContext(request))
@@ -104,7 +106,7 @@ def AddBlog(request):
     if request.method == 'POST':
         title = request.POST.get('title', '')
         body = request.POST.get('body', '')
-        status = request.POST.get('blog_status', '')
+        status = request.POST.get('status', '')
         abstract = request.POST.get('abstract', '')
         keywords = request.POST.get('keywords', '')
         en_keywords = request.POST.get('en_keywords', '')
@@ -118,7 +120,7 @@ def AddBlog(request):
         if not myFile:
             return HttpResponse('Please upload file.')
 
-        destination = open(os.path.join(settings.MEDIA_ROOT, myFile.name),'wb+') 
+        destination = open(os.path.join(settings.MEDIA_ROOT, myFile.name),'wb+')
         for chunk in myFile.chunks(): 
             destination.write(chunk)  
         destination.close()
@@ -128,7 +130,6 @@ def AddBlog(request):
         attachedFile.name = myFile.name
         attachedFile.attachment = myFile.name
         newFile = attachedFile.save()
-        print newFile
 
 
         article = Article()
@@ -140,12 +141,13 @@ def AddBlog(request):
         article.en_keywords = en_keywords
         article.topped = topped
         article.price = price
-        article.attachment = newFile.id
+        article.attachment = Attachment.objects.filter(name=myFile.name)[0]
         article.category = Category.objects.filter(id=category)[0]
         article.tag = Tag.objects.filter(id=tag)[0]
         article.save()
 
-        return HttpResponse(article)
+        article_id = Article.objects.filter(title=title, status=article.status, category=article.category, tag=article.tag)[0]
+        return ArticleDetailView(article_id)
 
 class CategoryView(ListView):
     """

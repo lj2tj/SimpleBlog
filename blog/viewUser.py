@@ -198,7 +198,7 @@ def logout(request):
 
 def file_iterator(file_name, chunk_size=512):
     """File downloader"""
-    with open(file_name) as new_file:
+    with open(file_name,'rb') as new_file:
         while True:
             block = new_file.read(chunk_size)
             if block:

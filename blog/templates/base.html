@@ -5,51 +5,57 @@
     <meta charset="UTF-8">
     <title></title>
     <link href="{% static 'favicon.ico' %}" rel="icon" type="image/x-icon" />
-    <link rel="stylesheet" href="{% static 'lib/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/base.css' %}">
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="{% static 'blog/css/style.css' %}">
     <link rel="stylesheet" href="{% static 'blog/css/header.css' %}">
     <link rel="stylesheet" href="{% static 'blog/css/footer.css' %}">
     <link rel="stylesheet" href="{% static 'blog/css/pygments/github.css' %}">
+
+
 </head>
 <body>
 {% block header %}
 <div class="headbox">
-	<div class="headerbox">
-        <a href="{% url 'blog:index' %}" class="newyxklogo">
-            <em>{{ WebSiteName }}</em>
-        </a>
-        <div class="bannerbtn">
-            <a href="/">首页</a>
+    <a href="{% url 'blog:index' %}" class="logo">
+        <em>{{ WebSiteName }}</em>
+    </a>
+    <div class="bannerbtn">
+        <a href="/">首页</a>
+        <span></span>
+        {% for category in category_list %}
+            <a href="{% url 'blog:category' category.pk %}">{{ category.name }}</a>
             <span></span>
-            {% for category in category_list %}
-                <a href="{% url 'blog:category' category.pk %}">{{ category.name }}</a>
-                <span></span>
-            {% endfor %}
-            <a href="{% url 'blog:about' %}">关于</a>
-            <div class="nw-line" style="display: none;"></div>
+        {% endfor %}
+        <a href="{% url 'blog:about' %}">关于</a>
+        <div class="now-line"></div>
+    </div>
+    {% if request.user.username != "" %}
+        <div class="registerlogin" >
+            <a href="{% url 'blog:logout' %}"><span class="pc-register">退出</span></a>
+            <a href="{% url 'blog:usercenter' %}"><span class="loginiocn">{{ request.user.username }}</span></a>
         </div>
-        {% if request.user.username != "" %}
-            <div class="registerlogin" >
-                <a href="{% url 'blog:logout' %}"><span class="pc-register">退出</span></a>
-                <a href="{% url 'blog:usercenter' %}"><span class="loginiocn">{{ request.user.username }}</span></a>
-            </div>
-        {% else %}
-            <div class="registerlogin" >
-                <a href="{% url 'blog:RegisterPage' %}"><span class="pc-register">注册</span></a>
-                <a href="{% url 'blog:LoginPage' %}"><span class="loginiocn">登录</span></a>
-                <div class="clear"></div>
-            </div>
-        {% endif %}
-        <div class="clear"></div>
-	</div>
+    {% else %}
+        <div class="registerlogin" >
+            <a href="{% url 'blog:RegisterPage' %}"><span class="pc-register">注册</span></a>
+            <a href="{% url 'blog:LoginPage' %}"><span class="loginiocn">登录</span></a>
+            <div class="clear"></div>
+        </div>
+    {% endif %}
+    <div class="clear"></div>
 </div>
+<div id="globalMessage" class="alert alert-warning" style="display: none;">
+    <a href="#" class="close" onclick="closeGlobalMessage()">
+        &times;
+    </a>
+    <strong>警告！</strong><span id="message" />
+</div>  
 {% endblock %}
 
 {% block content %}{% endblock %}
 
 <div class="bottom">
     <div class="bottomboxd">
-        <span class="linebg"></span>
         <p>©2012&nbsp;&nbsp;北京XX有限公司&nbsp;&nbsp;All Rights Reserved.&nbsp;&nbsp;注册地址:北京&nbsp;&nbsp;联系电话:82736610</p>
         <p>
             <a target="_blank" href="" rel="nofollow" style="margin-right:5px;font-weight:300;">京ICP证1234567号</a>
@@ -62,7 +68,52 @@
 </div>
 <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
 <script type="text/javascript" src="{% static 'blog/js/jquery-3.1.1.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'lib/js/bootstrap.min.js' %}"></script>
+<script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
+<script type="text/javascript">
+    function setCookie(name, value){
+        var exp = new Date();
+        exp.setTime(exp.getTime() + 1 * 60 * 60 * 1000) // Expire time is 1 hour.
+        document.cookie += ";" + name + "=" + escape(value);// + "; expires=" + exp.toGMTString();
+    }
+
+    function getCookie(name){
+        var arr,reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
+        if(arr=document.cookie.match(reg)){
+            return unescape(arr[2]);
+        }else{
+            return null;
+        }
+    }
+
+    function deleteCookie(name){
+        
+    }
+
+    function showGlobalMessage(message){
+        $("#message").text(message);
+        $("#globalMessage").show();
+    }
+
+    function closeGlobalMessage(){
+        $("#message").text();
+        $("#globalMessage").hide();
+    }
+
+    $(".bannerbtn a").click(function (){
+        var left = $(this).css("left");
+        $(".now-line").css("left", left);
+        setCookie("left", left);
+        return true;
+    });
+
+    $().ready(function (){
+        var left = getCookie("left");
+        if(left == null){
+            setCookie("left", "0px");
+        }
+        $(".now-line").css("left", left);
+    })
+</script>
 </body>
 </html>

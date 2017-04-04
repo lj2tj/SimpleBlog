@@ -49,6 +49,9 @@
         	<h4>
 			{{ request.user.username }}			<span class="{{ request.userprofile.website_level }}"></span>
 			</h4>
+            <div>
+                <a href="{% url 'blog:NewArticle' %}">发布新文章</a>
+            </div>
         </div>
     </div>
     <em></em>
