@@ -1,83 +1,81 @@
 {% extends 'base.html' %}
 {% block content %}
-    <div class="container">
-        <div class="col-lg-12 col-md-12 col-sm-12">
-            <div id="bd" class="wrp clear-fix">
-                <div id="main">
-                    <div id="detail-title">
-                        <ul id="single-nav">
-                            <li><a href="{% url 'blog:index' %}">首页</a></li>
-                            <li>&gt;</li>
-                            <li>
-                                <ul class="post-categories">
-                                    <li><a href="" title=""
-                                           rel="category">{{ article.category.name }}</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li>&gt;</li>
-                            <li class="title-active"><a href="{% url 'blog:detail' article.pk %}"
-                                                        rel="bookmark">{{ article.title }}</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="post">
-                        <h3>
-                            <a href="#" class="title">{{ article.title }}</a>
-                        </h3>
-                        <div class="date-read">
-                            <i class="icon-sprofile"></i><span
-                                class="date">{{ article.user.username }}</span>
-                            <i class="icon-date"></i><span
-                                class="date">{{ article.last_modified_time|date:"Y年n月d日" }}</span>
-                            <i class="icon-money"></i><span
-                                class="date">{{ article.price }}</span>
-                            <i class="icon-unlike" onclick="this.className='icon-like'"></i><span
-                                class="date">{{ article.likes }}</span>
-                        </div>
-                        <div class="post-kw">
-                            <p class="post-label">摘要</p>
-                            <p class="post-value">{{ article.abstract |safe | linebreaks}}</p>
-                            <div class="clear"></div>
-                        </div>
-                        <div class="post-kw">
-                            <p class="post-label">关键词</p>
-                            <p class="post-value">{{ article.keywords |safe }}</p>
-                            <div class="clear"></div>
-                        </div>
-                        <div class="post-kw">
-                            <p class="post-label">Key Words</p>
-                            <p class="post-value">{{ article.en_keywords |safe }}</p>
-                            <div class="clear"></div>
-                        </div>
-                        <div class="post-bd">
-                            <p>{{ article.body | safe | linebreaks}}</p>
-                        </div>
-                        <div class="post-attachment">
-                            <table>
-                            <caption>附件</caption>
-                            <thead>
-                                <tr style="width:100%">
-                                    <th class="col-lg-6 col-md-6 col-sm-6">附件名</th>
-                                    <th class="col-lg-2 col-md-2 col-sm-2">价格</th>
-                                    <th class="col-lg-2 col-md-2 col-sm-2">购买次数</th>
-                                    <th class="col-lg-2 col-md-2 col-sm-2">购买</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="col-lg-6 col-md-6 col-sm-6"><a href="{% url 'blog:purchase' article.attachment.id %}">{{ article.attachment.name }}</a></td>
-                                    <th class="col-lg-2 col-md-2 col-sm-2">{{ article.price }}</th>
-                                    <td class="col-lg-2 col-md-2 col-sm-2">{{ article.attachment.download_times}}</td>
-                                    <td class="col-lg-2 col-md-2 col-sm-2"><span class="hovered"><a href="{% url 'blog:purchase' article.attachment.id %}">下载</a></span></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        </div>
-                    </div>
-                </div>
+{% load staticfiles %}
+<link rel="stylesheet" href="{% static 'blog/css/detail.css' %}">
+<div id="main">
+    <div id="detail-title">
+        <ul id="single-nav">
+            <li><a href="{% url 'blog:index' %}">首页</a></li>
+            <li>&gt;</li>
+            <li>
+                <ul class="post-categories">
+                    <li><a href="" title=""
+                            rel="category">{{ article.category.name }}</a>
+                    </li>
+                </ul>
+            </li>
+            <li>&gt;</li>
+            <li class="title-active"><a href="{% url 'blog:detail' article.pk %}"
+                                        rel="bookmark">{{ article.title }}</a>
+            </li>
+        </ul>
+    </div>
+    <div class="post">
+        <div class="post-content">
+            <h3>
+                <a href="#" class="title">{{ article.title }}</a>
+            </h3>
+            <div class="date-read">
+                <i class="icon-sprofile"></i><span
+                    class="date">{{ article.user.username }}</span>
+                <i class="icon-date"></i><span
+                    class="date">{{ article.last_modified_time|date:"Y年n月d日" }}</span>
+                <i class="icon-money"></i><span
+                    class="date">{{ article.price }}</span>
+                <i class="icon-unlike" onclick="this.className='icon-like'"></i><span
+                    class="date">{{ article.likes }}</span>
             </div>
-            {% include 'blog/comment.html' %}
+            <div class="post-kw">
+                <p class="post-label">摘要</p>
+                <p class="post-value">{{ article.abstract |safe | linebreaks}}</p>
+                <div class="clear"></div>
+            </div>
+            <div class="post-kw">
+                <p class="post-label">关键词</p>
+                <p class="post-value">{{ article.keywords |safe }}</p>
+                <div class="clear"></div>
+            </div>
+            <div class="post-kw">
+                <p class="post-label">Key Words</p>
+                <p class="post-value">{{ article.en_keywords |safe }}</p>
+                <div class="clear"></div>
+            </div>
+            <div class="post-bd">
+                <p>{{ article.body | safe | linebreaks}}</p>
+            </div>
+        </div>
+        <div class="post-ft">
+            <span>附件</span>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>附件名</th>
+                        <th>价格</th>
+                        <th>购买次数</th>
+                        <th>购买</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><a href="{% url 'blog:purchase' article.attachment.id %}">{{ article.attachment.name }}</a></td>
+                        <th>{{ article.price }}</th>
+                        <td>{{ article.attachment.download_times}}</td>
+                        <td><span class="hovered"><a href="{% url 'blog:purchase' article.attachment.id %}">下载</a></span></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
     </div>
+    {% include 'blog/comment.html' %}
+</div>
 {% endblock %}

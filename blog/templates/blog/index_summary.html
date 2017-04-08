@@ -1,52 +1,47 @@
 {% extends 'base.html' %}
 {% block content %}
 {% load staticfiles %}
-<link rel="stylesheet" href="{% static 'blog/css/doc_list.css' %}">
-
-<div class="container">
-    <div class="col-lg-12">
-        <div id="main">
-        {% if article_list.count == 0 %}
-            <div class="liebietitle">
-                <ptag class="empty_list">还没有上传文档</ptag>
-                <div class="clear"></div>
-            </div>
-            <div class="rmwdlistbox">&nbsp;:(&nbsp;</div>
-        {% else %}
-        {% for tag in tag_list %}
-            <div class="liebietitle">
-                {% comment %}
-                <p class="rmwdiconbig" onclick="window.location.href = '/tag/{{ tag.id }}';">{{ tag.name }}</p>
-                {% endcomment %}
-                <p class="rmwdiconbig">{{ tag.tag__name }}</p>
-                <div class="clear"></div>
-            </div>
-            <div class="rmwdlistbox">
-                <ul>
-                {% for article in article_list %}
-                    {% if tag.tag__id == article.tag_id %}
-                    <li>
-                        <a href="{% url 'blog:detail' article.id %}" target="_blank" class="zqlistpicd">
-                            <img src="{% static 'blog/img/artical.png' %}" alt="{{ article.title }}">
-                        </a>
-                        <a href="{% url 'blog:detail' article.id %}" target="_blank" class="zqlisttitled" title="{{ article.title }}">{{ article.title }}</a>
-                        <span class="gxauthor">贡献者：<em>{{ article.user.username}}</em></span>
-                        <span class="gxtimeli">贡献时间：<em>{{ article.created_time | date:"Y年n月d日" }}</em></span>
-                        <div class="scnts-upload">
-                            <p>{{ article.views }}</p>
-                            <b class="renminbi">{{ article.price }}</b>
-                            <span class="hovered"><a href="{% url 'blog:purchase' article.id %}">下载</a></span>
-                            <div class="clear"></div>
-                        </div>
-                    </li>
-                    {% endif %}
-                {% endfor %}
-                </ul>
-                <div class="clear"></div>
-            </div>
-        {% endfor %}
-        {% endif %}
-      </div>
+<link rel="stylesheet" href="{% static 'blog/css/article_list.css' %}">
+<div id="main">
+{% if article_list.count == 0 %}
+    <div class="leibietitle">
+        <p class="emptylist">还没有上传文档</p>
+        <div class="clear"></div>
     </div>
+    <div class="articlecontainer">&nbsp;:(&nbsp;</div>
+{% else %}
+    {% for tag in tag_list %}
+        <div class="leibietitle">
+            {% comment %}
+            <p class="tagname" onclick="window.location.href = '/tag/{{ tag.id }}';">{{ tag.name }}</p>
+            {% endcomment %}
+            <p class="tagname">{{ tag.name }}</p>
+            <div class="clear"></div>
+        </div>
+        <div class="articlecontainer">
+            <ul>
+            {% for article in article_list %}
+                {% if tag.id == article.tag_id %}
+                <li>
+                    <a href="{% url 'blog:detail' article.id %}" target="_blank">
+                        <img src="{% static 'blog/img/artical.png' %}" alt="{{ article.title }}">
+                    </a>
+                    <a href="{% url 'blog:detail' article.id %}" target="_blank" class="zqlisttitled" title="{{ article.title }}">{{ article.title }}</a>
+                    <span class="author">贡献者：<em>{{ article.user.username}}</em></span>
+                    <span class="time">贡献时间：<em>{{ article.created_time | date:"Y年n月d日" }}</em></span>
+                    <div class="articlestatus">
+                        <p>{{ article.views }}</p>
+                        <b class="renminbi">{{ article.price }}</b>
+                        <span class="hovered"><a href="{% url 'blog:purchase' article.id %}">下载</a></span>
+                        <div class="clear"></div>
+                    </div>
+                </li>
+                {% endif %}
+            {% endfor %}
+            </ul>
+            <div class="clear"></div>
+        </div>
+    {% endfor %}
+{% endif %}
 </div>
 {% endblock %}

@@ -57,8 +57,7 @@ class IndexView(ListView):
         kwargs['WebSiteName'] = WebSiteName
         kwargs['category_list'] = Category.objects.all().order_by('created_time')
         kwargs['date_archive'] = Article.objects.archive()
-        kwargs['tag_list'] = Article.objects.filter(status='p')\
-            .values('tag__id', 'tag__name', 'created_time').order_by('created_time')
+        kwargs['tag_list'] = Tag.objects.all().order_by('created_time')
         return super(IndexView, self).get_context_data(**kwargs)
 
 
@@ -167,8 +166,7 @@ class CategoryView(ListView):
         kwargs['WebSiteName'] = WebSiteName
         kwargs['category_list'] = Category.objects.all().order_by('created_time')
         kwargs['date_archive'] = Article.objects.archive()
-        kwargs['tag_list'] = Article.objects.filter(category=self.kwargs['cate_id'], status='p')\
-            .values('tag__id', 'tag__name', 'created_time').order_by('created_time')
+        kwargs['tag_list'] = Tag.objects.all().order_by('created_time')
         return super(CategoryView, self).get_context_data(**kwargs)
 
 
