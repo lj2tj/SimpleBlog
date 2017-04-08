@@ -60,38 +60,19 @@
     <div class="bottomboxd">
         <p>©2012&nbsp;&nbsp;北京XX有限公司&nbsp;&nbsp;All Rights Reserved.&nbsp;&nbsp;注册地址:北京&nbsp;&nbsp;联系电话:82736610</p>
         <p>
-            <a target="_blank" href="" rel="nofollow" style="margin-right:5px;font-weight:300;">京ICP证1234567号</a>
-            <a style="display:inline-block;text-decoration:none;height:20px;line-height:20px; font-weight:300;" href="" rel="nofollow" target="_blank">
+            <a target="_blank" href="" rel="nofollow">京ICP证1234567号</a>
+            <a href="#" rel="nofollow" target="_blank">
                 <img alt="备案" src="{% static 'blog/img/gongan.png' %}">京公网安备 111111111号
             </a>
         </p>
         <div class="clear"></div>
     </div>
 </div>
-<!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
 <script type="text/javascript" src="{% static 'blog/js/jquery-3.1.1.min.js' %}"></script>
+<script type="text/javascript" src="{% static 'blog/js/jquery.cookie.js' %}"></script>
 <script src="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
 <script type="text/javascript">
-    function setCookie(name, value){
-        var exp = new Date();
-        exp.setTime(exp.getTime() + 1 * 60 * 60 * 1000) // Expire time is 1 hour.
-        document.cookie += ";" + name + "=" + escape(value);// + "; expires=" + exp.toGMTString();
-    }
-
-    function getCookie(name){
-        var arr,reg = new RegExp("(^| )" + name + "=([^;]*)(;|$)");
-        if(arr=document.cookie.match(reg)){
-            return unescape(arr[2]);
-        }else{
-            return null;
-        }
-    }
-
-    function deleteCookie(name){
-        
-    }
-
     function showGlobalMessage(message){
         $("#message").text(message);
         $("#globalMessage").show();
@@ -105,17 +86,18 @@
     $(".bannerbtn a").click(function (){
         var left = $(this).css("left");
         $(".now-line").css("left", left);
-        setCookie("left", left);
+        $.removeCookie('left');
+        $.cookie("left", left, { expires: 1, path: '/' });
         return true;
     });
 
     $().ready(function (){
-        var left = getCookie("left");
+        var left = $.cookie('left');
         if(left == null){
-            setCookie("left", "0px");
+            $.cookie("left", "0px", { expires: 1, path: '/' });
         }
         $(".now-line").css("left", left);
-    })
+    });
 </script>
 </body>
 </html>

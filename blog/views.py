@@ -12,10 +12,10 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, FormView
 from django.contrib.auth.models import User
-from blog.models import Article, Attachment, Category, Tag, UserProfile
+from blog.models import Article, Attachment, Category, Tag, UserProfile, UserLikedArticles
 from .models import BlogComment, AppSettings
 from .forms import CustomeLoginForm, BlogCommentForm, ArticleEditForm
-from django.http import StreamingHttpResponse, HttpResponse, request
+from django.http import StreamingHttpResponse, HttpResponse, HttpRequest, request
 
 WebSiteName = ''
 if AppSettings.objects.filter(name='WebSiteName') is not None:
@@ -82,6 +82,14 @@ class ArticleDetailView(DetailView):
         kwargs['WebSiteName'] = WebSiteName
         kwargs['category_list'] = Category.objects.all().order_by('created_time')
         kwargs['comment_list'] = self.object.blogcomment_set.all()
+        allLike = UserLikedArticles.objects.filter(article=self.object.id)
+        kwargs['allLike'] = len(allLike)
+        
+        like = UserLikedArticles.objects.filter(user=self.request.user.id, article=self.object.id)
+        liked = False
+        if like != None and len(like) > 0:
+            liked = True
+        kwargs['like'] = liked 
         kwargs['form'] = BlogCommentForm()
         return super(ArticleDetailView, self).get_context_data(**kwargs)
 

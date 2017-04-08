@@ -13,12 +13,45 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, FormView
 from blog.models import UserProfile, UserDownloadFile, BlogComment, AppSettings
-from blog.models import Article, Attachment, Category, Tag, UserProfile
+from blog.models import Article, Attachment, Category, Tag, UserProfile, UserLikedArticles
 from django.http import StreamingHttpResponse, HttpResponse
 
 WebSiteName = ''
 if AppSettings.objects.filter(name='WebSiteName') is not None:
     WebSiteName = AppSettings.objects.filter(name='WebSiteName')[0].value
+
+def LikeArticle(request):
+    """
+    Like or unlike an article.
+    """
+    try:
+        if not request.user.is_authenticated():
+            return render_to_response("user/login.html", \
+            RequestContext(request, {"WebSiteName" : WebSiteName}))
+
+        like = request.GET.get('like', '')
+        article_id = request.GET.get('article_id', '')
+
+        if str(like).lower() != 'true':
+            like = 'false'
+        else:
+            like = 'true'
+            
+        record = UserLikedArticles.objects.filter(user=request.user.id, article=article_id)
+
+        if like == 'false':
+            if record != None and len(record) > 0:
+                record[0].delete()
+        else:
+            if record == None or len(record) == 0:
+                like = UserLikedArticles()
+                like.user = request.user.id
+                like.article=Article.objects.filter(id=article_id)[0]
+                like.save()
+        
+        return HttpResponse("1")
+    except Exception, e:
+        return HttpResponse(e)
 
 def UpdateUserInfo(request):
     """
@@ -30,7 +63,6 @@ def UpdateUserInfo(request):
             RequestContext(request, {"WebSiteName" : WebSiteName}))
 
         user = User.objects.filter(id=request.user.id)[0]
-        #user = User(username=current_user.username, password=current_user.password)
         email = request.GET.get('email', '')
 
         if email.find("@") <= 0:

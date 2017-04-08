@@ -24,12 +24,12 @@
                 {% if tag.id == article.tag_id %}
                 <li>
                     <a href="{% url 'blog:detail' article.id %}" target="_blank">
-                        <img src="{% static 'blog/img/artical.png' %}" alt="{{ article.title }}">
+                        <img src="{% static 'blog/img/artical.png' %}" style="width: 175px;" alt="{{ article.title }}">
                     </a>
-                    <a href="{% url 'blog:detail' article.id %}" target="_blank" class="zqlisttitled" title="{{ article.title }}">{{ article.title }}</a>
-                    <span class="author">贡献者：<em>{{ article.user.username}}</em></span>
-                    <span class="time">贡献时间：<em>{{ article.created_time | date:"Y年n月d日" }}</em></span>
-                    <div class="articlestatus">
+                    <a class="article-left" href="{% url 'blog:detail' article.id %}" target="_blank" class="zqlisttitled" title="{{ article.title }}">{{ article.title }}</a>
+                    <span class="author article-left">贡献者：<em>{{ article.user.username}}</em></span>
+                    <span class="time article-left">贡献时间：<em>{{ article.created_time | date:"Y年n月d日" }}</em></span>
+                    <div class="articlestatus article-left">
                         <p>{{ article.views }}</p>
                         <b class="renminbi">{{ article.price }}</b>
                         <span class="hovered"><a href="{% url 'blog:purchase' article.id %}">下载</a></span>

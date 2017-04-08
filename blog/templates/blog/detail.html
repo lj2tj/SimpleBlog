@@ -17,6 +17,8 @@
             <li>&gt;</li>
             <li class="title-active"><a href="{% url 'blog:detail' article.pk %}"
                                         rel="bookmark">{{ article.title }}</a>
+                <input type="hidden" id="hid_article_id" value="{{ article.id }}">
+                <input type="hidden" id="hid_article_like" value="{{ like }}">
             </li>
         </ul>
     </div>
@@ -32,8 +34,7 @@
                     class="date">{{ article.last_modified_time|date:"Y年n月d日" }}</span>
                 <i class="icon-money"></i><span
                     class="date">{{ article.price }}</span>
-                <i class="icon-unlike" onclick="this.className='icon-like'"></i><span
-                    class="date">{{ article.likes }}</span>
+                <i id="like_icon" onclick="LikeArticle()"></i><span id="like_count" class="date">{{ allLike }}</span>
             </div>
             <div class="post-kw">
                 <p class="post-label">摘要</p>
@@ -78,4 +79,62 @@
     </div>
     {% include 'blog/comment.html' %}
 </div>
+
+<script type="text/javascript">
+    var liked = false;
+
+    function ChangeStyle(like){
+        if(like){
+            if($("#like_icon").hasClass("icon-unlike")){
+                $("#like_icon").removeClass("icon-unlike")
+            }
+            $("#like_icon").addClass("icon-like")
+            $("#hid_article_like").val("true")
+        }else{
+            $("#like_icon").addClass("icon-unlike")
+            if($("#like_icon").hasClass("icon-like")){
+                $("#like_icon").removeClass("icon-like")
+            }
+            $("#hid_article_like").val("false")
+        }
+    }
+
+    function LikeArticle(){
+        var temp_like = liked;
+        if(liked.toString() == "true"){
+            temp_like = false;
+        }else{
+            temp_like = true;
+        }
+        $.get("/LikeArticle", { 'like': temp_like, 'article_id': $("#hid_article_id").val()},
+            function(data){
+                if(data != '1'){
+                    $('#message').text("收藏失败！"+data);
+                    $('#globalMessage').show();
+                    return false;
+                }else{
+                    var count = parseInt($("#like_count").text());
+                    liked = temp_like;
+                    if(liked){
+                        $("#like_count").text(count+1)
+                    }else{
+                        $("#like_count").text(count-1)
+                    }
+                    ChangeStyle(liked);
+                    $('#globalMessage').hide();
+                }
+            });
+    }
+
+    window.onload = function(){
+        var default_like = $("#hid_article_like").val().toLowerCase();
+        if(default_like == "true"){
+            liked = true;
+        }else{
+            liked = false;
+        }
+        ChangeStyle(liked);
+    };
+</script>
+
 {% endblock %}

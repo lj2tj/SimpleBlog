@@ -82,6 +82,15 @@ class UserProfile(models.Model):
         verbose_name = "认证作者"
         verbose_name_plural = verbose_name
 
+class UserLikedArticles(models.Model):
+    """
+    Save all user liked articles.
+    """
+    user = models.IntegerField("用户编号", blank=True)
+    article = models.ForeignKey('Article', unique=False, verbose_name=('文章'))
+    comment = models.CharField("注释", max_length=100, blank=True)
+    comment_time = models.DateTimeField('时间', auto_now_add=True)
+
 
 class UserDownloadFile(models.Model):
     """
