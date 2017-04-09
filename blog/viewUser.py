@@ -184,10 +184,12 @@ def UserCenter(request):
     downloaded_files = UserDownloadFile.objects.filter(user_id=base_info.id)
     if not any(downloaded_files):
         downloaded_files = []
+    liked_articles = UserLikedArticles.objects.filter(user=request.user.id)
 
     dic = {'category_list':category_list, \
     'base_info': base_info, 'uploaded_files': uploaded_files, \
-    'downloaded_files': downloaded_files}
+    'downloaded_files': downloaded_files, \
+    'liked_articles':liked_articles}
     return render(request, "user/usercenter.html", dic)
 
 

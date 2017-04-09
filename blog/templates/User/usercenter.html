@@ -90,7 +90,7 @@
     	<ul>
         	<li>我的上传：{{ uploaded_files | length }} 篇</li>
             <li>我的下载：{{ downloaded_files | length }} 篇</li>
-            <li>我的收藏：篇</li>
+            <li>我的收藏：<a href="#">{{ liked_articles | length }}</a> 篇</li>
             <li>我的转发：篇</li>
         </ul>
     </div>
@@ -104,7 +104,7 @@
             <a href="#wdsc">我的上传：篇</a>
             <a href="#wdgm">我的购买：篇</a>
             <a href="#wdxz">我的下载：篇</a>
-            <a href="#wdscang">我的收藏：篇</a>
+            <a href="#wdscang">我的收藏：{{ liked_articles | length }} 篇</a>
         </div>
     </div>
     <div class="personalright" id="personalright">
