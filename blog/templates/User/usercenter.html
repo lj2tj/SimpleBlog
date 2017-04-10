@@ -50,7 +50,7 @@
 			{{ request.user.username }}			<span class="{{ request.userprofile.website_level }}"></span>
 			</h4>
             <div>
-                <a href="{% url 'blog:NewArticle' %}">发布新文章</a>
+                <a class="btn btn-success" href="{% url 'blog:NewArticle' %}">发布新文章</a>
             </div>
         </div>
     </div>
@@ -65,7 +65,7 @@
                 {% endif %}
                 >
                     <input id="email" type="email" placeholder="sample@test.com" onkeydown="trySaveEmail()" value="">
-                    <input type="button" value="保存" onclick="saveEmail()" />
+                    <a href="#" class="btn btn-danger btn-small" onclick="saveEmail()">保存</a>
                     <div class="tipsboxalert" id="emailError" style="display: none;">
                         <p id="emailMsg"></p>
                     </div>
@@ -77,7 +77,7 @@
                 style="display: block;"
                 {% endif %}>
                     <b>{{ base_info.email }}</b>
-                    <input type="button" value="修改" onclick="updateEmail()" />
+                    <a href="#" class="btn btn-danger btn-small" onclick="updateEmail()">修改</a>
                 </div>
             </li>
             <li>最近登录：<b>{{ base_info.last_login }}</b></li>
@@ -99,16 +99,23 @@
 
 <div class="personal">
     <div class="personalleft" id="personalleft" style="height: 514px;">
-        <div class="listbox">
-            <a href="#jbxx" class="on">基本信息</a>
-            <a href="#wdsc">我的上传：篇</a>
-            <a href="#wdgm">我的购买：篇</a>
-            <a href="#wdxz">我的下载：篇</a>
-            <a href="#wdscang">我的收藏：{{ liked_articles | length }} 篇</a>
+        <div class="listbox nav nav-tabs">
+            <a href="#basic" class="on">基本信息</a>
+            <a href="#upload" data-toggle="tab">我的上传：{{ uploaded_files | length }} 篇</a>
+            <a href="#purchase" data-toggle="tab">我的购买：篇</a>
+            <a href="#download" data-toggle="tab">我的下载：篇</a>
+            <a href="#like" data-toggle="tab">我的收藏：{{ liked_articles | length }} 篇</a>
         </div>
     </div>
-    <div class="personalright" id="personalright">
-
+    <div class="personalright tab-content" id="personalright">
+        <div class="tab-pane fade in active" id="upload">uploaduploaduploadupload
+        </div>
+        <div class="tab-pane fade" id="purchase">purchasepurchasepurchasepurchase
+        </div>
+        <div class="tab-pane fade" id="download">downloaddownloaddownloaddownload
+        </div>
+        <div class="tab-pane fade" id="like">likelikelikelikelike
+        </div>
     </div>
     <div class="clear"></div>
 </div>

@@ -56,7 +56,6 @@
             </div>
         </div>
         <div class="post-ft">
-            <span>附件</span>
             <table class="table">
                 <thead>
                     <tr>
@@ -108,11 +107,8 @@
         }
         $.get("/LikeArticle", { 'like': temp_like, 'article_id': $("#hid_article_id").val()},
             function(data){
-                if(data != '1'){
-                    $('#message').text("收藏失败！"+data);
-                    $('#globalMessage').show();
-                    return false;
-                }else{
+                var result = JSON.parse(data)
+                if(result["result"] == '0'){
                     var count = parseInt($("#like_count").text());
                     liked = temp_like;
                     if(liked){
@@ -122,6 +118,12 @@
                     }
                     ChangeStyle(liked);
                     $('#globalMessage').hide();
+                }else if (result["result"] == '1'){
+                    window.location.href = '/login';
+                }else{
+                    $('#message').text("收藏失败！"+data);
+                    $('#globalMessage').show();
+                    return false;
                 }
             });
     }

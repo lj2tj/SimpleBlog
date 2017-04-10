@@ -151,10 +151,12 @@ def AddBlog(request):
         article.attachment = Attachment.objects.filter(name=myFile.name)[0]
         article.category = Category.objects.filter(id=category)[0]
         article.tag = Tag.objects.filter(id=tag)[0]
+        article.user = User.objects.filter(id=request.user.id)[0]
         article.save()
 
         article_id = Article.objects.filter(title=title, status=article.status, category=article.category, tag=article.tag)[0]
-        return ArticleDetailView(article_id)
+        url = "article/" + str(article_id.id)
+        return HttpResponseRedirect(url)
 
 class CategoryView(ListView):
     """

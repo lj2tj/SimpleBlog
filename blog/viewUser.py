@@ -2,6 +2,7 @@
 #coding=utf-8
 
 import os
+import json
 from datetime import datetime
 from django.shortcuts import render, get_object_or_404, HttpResponseRedirect, render_to_response
 from django.template import RequestContext, loader
@@ -26,8 +27,9 @@ def LikeArticle(request):
     """
     try:
         if not request.user.is_authenticated():
-            return render_to_response("user/login.html", \
-            RequestContext(request, {"WebSiteName" : WebSiteName}))
+            return HttpResponse(json.dumps({
+                "result": "1"
+            }))
 
         like = request.GET.get('like', '')
         article_id = request.GET.get('article_id', '')
@@ -49,9 +51,13 @@ def LikeArticle(request):
                 like.article=Article.objects.filter(id=article_id)[0]
                 like.save()
         
-        return HttpResponse("1")
+        return HttpResponse(json.dumps({
+                "result": 0
+            }))
     except Exception, e:
-        return HttpResponse(e)
+        return HttpResponse(json.dumps({
+                "result": e
+            }))
 
 def UpdateUserInfo(request):
     """
