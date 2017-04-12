@@ -243,6 +243,9 @@ class BlogComment(models.Model):
     def __str__(self):
         return self.body[:20]
 
+class WebSiteConfig:
+    WebSiteName = ""
+    ICP = ""
 
 class AppSettings(models.Model):
     """

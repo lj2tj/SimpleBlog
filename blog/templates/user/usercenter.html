@@ -91,7 +91,6 @@
         	<li>我的上传：{{ uploaded_files | length }} 篇</li>
             <li>我的下载：{{ downloaded_files | length }} 篇</li>
             <li>我的收藏：<a href="#">{{ liked_articles | length }}</a> 篇</li>
-            <li>我的转发：篇</li>
         </ul>
     </div>
     <div class="clear"></div>
@@ -102,17 +101,16 @@
         <div class="listbox nav nav-tabs">
             <a href="#basic" class="on">基本信息</a>
             <a href="#upload" data-toggle="tab">我的上传：{{ uploaded_files | length }} 篇</a>
-            <a href="#purchase" data-toggle="tab">我的购买：篇</a>
-            <a href="#download" data-toggle="tab">我的下载：篇</a>
+            <a href="#purchase" data-toggle="tab">我的下载：{{ downloaded_files | length }} 篇</a>
             <a href="#like" data-toggle="tab">我的收藏：{{ liked_articles | length }} 篇</a>
         </div>
     </div>
     <div class="personalright tab-content" id="personalright">
-        <div class="tab-pane fade in active" id="upload">uploaduploaduploadupload
+        <div class="tab-pane fade in active" id="basic">uploaduploaduploadupload
+        </div>
+        <div class="tab-pane fade" id="upload">uploaduploaduploadupload
         </div>
         <div class="tab-pane fade" id="purchase">purchasepurchasepurchasepurchase
-        </div>
-        <div class="tab-pane fade" id="download">downloaddownloaddownloaddownload
         </div>
         <div class="tab-pane fade" id="like">likelikelikelikelike
         </div>

@@ -25,6 +25,6 @@ urlpatterns = [
     url(r'^(?i)login$', viewUser.login, name='login'),
     url(r'^(?i)logout$', viewUser.logout, name='logout'),
     url(r'^(?i)loginpage$', viewUser.loginPage, name='LoginPage'),
-    url(r'^(?i)purchase/(?P<attachment_id>\d+)$', login_required(viewUser.Purchase), \
+    url(r'^(?i)purchase/(?P<article_id>\d+)/(?P<attachment_id>\d+)$', login_required(viewUser.Purchase), \
     name='purchase'),
 ]

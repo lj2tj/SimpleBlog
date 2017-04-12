@@ -13,13 +13,17 @@ from django.contrib.auth.models import User
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, FormView
-from blog.models import UserProfile, UserDownloadFile, BlogComment, AppSettings
+from blog.models import UserProfile, UserDownloadFile, BlogComment, AppSettings, WebSiteConfig, TradeMode
 from blog.models import Article, Attachment, Category, Tag, UserProfile, UserLikedArticles
 from django.http import StreamingHttpResponse, HttpResponse
 
-WebSiteName = ''
+
+WebSiteInfo = WebSiteConfig()
+
 if AppSettings.objects.filter(name='WebSiteName') is not None:
-    WebSiteName = AppSettings.objects.filter(name='WebSiteName')[0].value
+    WebSiteInfo.WebSiteName = AppSettings.objects.filter(name='WebSiteName')[0].value
+if AppSettings.objects.filter(name='ICP') is not None:
+    WebSiteInfo.ICP = AppSettings.objects.filter(name='ICP')[0].value
 
 def LikeArticle(request):
     """
@@ -66,7 +70,7 @@ def UpdateUserInfo(request):
     try:
         if not request.user.is_authenticated():
             return render_to_response("user/login.html", \
-            RequestContext(request, {"WebSiteName" : WebSiteName}))
+            RequestContext(request, {"WebSiteInfo" : WebSiteInfo}))
 
         user = User.objects.filter(id=request.user.id)[0]
         email = request.GET.get('email', '')
@@ -102,7 +106,7 @@ def registerPage(request):
     Show user register page.
     """
     return render_to_response("user/userregister.html", \
-        RequestContext(request, {"WebSiteName" : WebSiteName}))
+        RequestContext(request, {"WebSiteInfo" : WebSiteInfo}))
 
 
 def register(request):
@@ -152,7 +156,7 @@ def loginPage(request):
     User login page.
     """
     return render_to_response("user/login.html", \
-        RequestContext(request, {"WebSiteName" : WebSiteName}))
+        RequestContext(request, {"WebSiteInfo" : WebSiteInfo}))
 
 
 def login(request):
@@ -180,26 +184,27 @@ def UserCenter(request):
     """
     if not request.user.is_authenticated():
         return render_to_response("user/login.html", RequestContext(request))
-    base_info = request.user
 
     category_list = Category.objects.all().order_by('created_time')
-    uploaded_files = Article.objects.filter(user_id=base_info.id)
+    uploaded_files = Article.objects.filter(user_id=request.user.id)
     if not any(uploaded_files):
         uploaded_files = []
 
-    downloaded_files = UserDownloadFile.objects.filter(user_id=base_info.id)
+    downloaded_files = UserDownloadFile.objects.filter(user_id=request.user.id)
     if not any(downloaded_files):
         downloaded_files = []
     liked_articles = UserLikedArticles.objects.filter(user=request.user.id)
 
     dic = {'category_list':category_list, \
-    'base_info': base_info, 'uploaded_files': uploaded_files, \
+    'base_info': request.user, \
+    'WebSiteInfo' : WebSiteInfo, \
+    'uploaded_files': uploaded_files, \
     'downloaded_files': downloaded_files, \
     'liked_articles':liked_articles}
     return render(request, "user/usercenter.html", dic)
 
 
-def Purchase(request, attachment_id):
+def Purchase(request, article_id, attachment_id):
     """
     By a document.
     """
@@ -218,12 +223,24 @@ def Purchase(request, attachment_id):
     the_file = Attachment.objects.filter(id=attachment_id)
     if the_file is None:
         return HttpResponse('No such file.')
+    
+    the_file = the_file[0]
+    article = Article.objects.filter(id=article_id)[0]
+    #Save user purchase article informantion.
+    purchase_record = UserDownloadFile()
+    purchase_record.user = User.objects.filter(id=request.user.id)[0]
+    purchase_record.article = article
+    purchase_record.origin_price = int(article.price)
+    purchase_record.deal_price = int(article.price)
 
-    file_full_name = os.path.join(upload_file_path, unicode(the_file[0].attachment))
+    purchase_record.trade_mode = TradeMode.objects.all()[0] #hardcode
+    purchase_record.save()
+
+    file_full_name = os.path.join(upload_file_path, unicode(the_file.attachment))
     print 'file_full_name', file_full_name
     response = StreamingHttpResponse(file_iterator(file_full_name))
     response['Content-Type'] = 'application/octet-stream'
-    response['Content-Disposition'] = 'attachment;filename="{0}"'.format(the_file[0].name)
+    response['Content-Disposition'] = 'attachment;filename="{0}"'.format(the_file.name)
     return response
 
 

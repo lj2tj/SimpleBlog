@@ -13,13 +13,17 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, FormView
 from django.contrib.auth.models import User
 from blog.models import Article, Attachment, Category, Tag, UserProfile, UserLikedArticles
-from .models import BlogComment, AppSettings
+from .models import BlogComment, AppSettings, WebSiteConfig
 from .forms import CustomeLoginForm, BlogCommentForm, ArticleEditForm
 from django.http import StreamingHttpResponse, HttpResponse, HttpRequest, request
 
-WebSiteName = ''
+
+WebSiteInfo = WebSiteConfig()
+
 if AppSettings.objects.filter(name='WebSiteName') is not None:
-    WebSiteName = AppSettings.objects.filter(name='WebSiteName')[0].value
+    WebSiteInfo.WebSiteName = AppSettings.objects.filter(name='WebSiteName')[0].value
+if AppSettings.objects.filter(name='ICP') is not None:
+    WebSiteInfo.ICP = AppSettings.objects.filter(name='ICP')[0].value
 
 class About(ListView):
     """
@@ -33,7 +37,7 @@ class About(ListView):
         return settings
 
     def get_context_data(self, **kwargs):
-        kwargs['WebSiteName'] = WebSiteName
+        kwargs['WebSiteInfo'] = WebSiteInfo
         kwargs['category_list'] = Category.objects.all().order_by('name')
         kwargs['settings'] = AppSettings.objects.all()
         return super(About, self).get_context_data(**kwargs)
@@ -54,7 +58,7 @@ class IndexView(ListView):
         return article_list
 
     def get_context_data(self, **kwargs):
-        kwargs['WebSiteName'] = WebSiteName
+        kwargs['WebSiteInfo'] = WebSiteInfo
         kwargs['category_list'] = Category.objects.all().order_by('created_time')
         kwargs['date_archive'] = Article.objects.archive()
         kwargs['tag_list'] = Tag.objects.all().order_by('created_time')
@@ -79,7 +83,7 @@ class ArticleDetailView(DetailView):
         return obj
 
     def get_context_data(self, **kwargs):
-        kwargs['WebSiteName'] = WebSiteName
+        kwargs['WebSiteInfo'] = WebSiteInfo
         kwargs['category_list'] = Category.objects.all().order_by('created_time')
         kwargs['comment_list'] = self.object.blogcomment_set.all()
         allLike = UserLikedArticles.objects.filter(article=self.object.id)
@@ -173,7 +177,7 @@ class CategoryView(ListView):
         return article_list
 
     def get_context_data(self, **kwargs):
-        kwargs['WebSiteName'] = WebSiteName
+        kwargs['WebSiteInfo'] = WebSiteInfo
         kwargs['category_list'] = Category.objects.all().order_by('created_time')
         kwargs['date_archive'] = Article.objects.archive()
         kwargs['tag_list'] = Tag.objects.all().order_by('created_time')
