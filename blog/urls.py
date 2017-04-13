@@ -8,6 +8,7 @@ from blog import views, viewUser
 urlpatterns = [
     url(r'^$', views.IndexView.as_view(), name='index'),
     url(r'^(?i)article/(?P<article_id>\d+)$', views.ArticleDetailView.as_view(), name='detail'),
+    url(r'^(?i)GetArticles/(?P<option>\w+)$', views.GetArticles, name='GetArticles'),
     url(r'^(?i)NewArticle$', login_required(views.NewArticle), name='NewArticle'),
     url(r'^(?i)AddBlog$', login_required(views.AddBlog), name='AddBlog'),
     url(r'^(?i)category/(?P<cate_id>\d+)$', views.CategoryView.as_view(), name='category'),

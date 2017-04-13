@@ -159,6 +159,9 @@ class Article(models.Model):
     def __str__(self):
         return self.title
 
+    def toDict(self):  
+        return dict([(attr, str(getattr(self, attr))) for attr in [f.name for f in self._meta.fields]])
+    
     class Meta:
         verbose_name = '文章'
         verbose_name_plural = verbose_name

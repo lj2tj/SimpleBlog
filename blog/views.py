@@ -2,6 +2,7 @@
 #coding=utf-8
 
 import os
+import json
 import markdown2
 from datetime import *
 from django.shortcuts import render, get_object_or_404, HttpResponseRedirect, render_to_response
@@ -12,7 +13,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, FormView
 from django.contrib.auth.models import User
-from blog.models import Article, Attachment, Category, Tag, UserProfile, UserLikedArticles
+from blog.models import Article, Attachment, Category, Tag, UserProfile, UserLikedArticles, UserDownloadFile
 from .models import BlogComment, AppSettings, WebSiteConfig
 from .forms import CustomeLoginForm, BlogCommentForm, ArticleEditForm
 from django.http import StreamingHttpResponse, HttpResponse, HttpRequest, request
@@ -106,6 +107,42 @@ def NewArticle(request):
 
     dic = {'category_list':category_list, 'tag_list': tag_list}
     return render(request, "blog/add_blog.html", dic)
+
+
+def GetArticles(request, option):
+    """
+    Get articles with given option.
+    """
+    articles = []
+    print(option)
+    if option == "all" and request.user.id == 1:
+        articles = Article.objects.all().order_by('created_time')
+    elif option == "all":
+        articles = Article.objects.filter(status="p").order_by('created_time')
+    elif option == "upload":
+        if not request.user.is_authenticated():
+            return render_to_response("user/login.html", RequestContext(request))
+        else:
+            articles = Article.objects.filter(user=request.user.id).order_by('created_time')
+        pass
+    elif option == "purchase":
+        if not request.user.is_authenticated():
+            return render_to_response("user/login.html", RequestContext(request))
+        else:
+            downloaded_file_id = UserDownloadFile.objects.filter(user=request.user.id).values('article')
+            articles = Article.objects.filter(user=request.user.id).order_by('created_time')
+        pass
+    elif option == "like":
+        if not request.user.is_authenticated():
+            return render_to_response("user/login.html", RequestContext(request))
+        else:
+            liked_file_id = UserLikedArticles.objects.filter(user=request.user.id).values('article')
+            articles = Article.objects.filter(user=request.user.id).order_by('created_time')
+        pass
+    else:
+        return [{"error":"Unknown option"}]
+    print("Count : ", len(articles))
+    return HttpResponse(json.dumps({ "total" : len(articles), "rows" : queryset_to_json(articles)}))
 
 def AddBlog(request):
     """
@@ -259,3 +296,12 @@ class AdminEditArticalView(FormView):
         return article
     pass
 
+
+
+
+
+def queryset_to_json(queryset):  
+    obj_arr=[]  
+    for o in queryset:  
+            obj_arr.append(o.toDict())  
+    return obj_arr 
