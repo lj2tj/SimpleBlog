@@ -85,12 +85,10 @@ def UpdateUserInfo(request):
         
         mobile_phone = request.GET.get('mobile_phone', '')
         position = request.GET.get('position', '')
-        print("position:", position)
         title = request.GET.get('jobTitle', '')
-        print("title:", title)
         location = request.GET.get('location', '')
 
-        if len(mobile_phone) > 0 or len(position) > 0 or len(jobTitle) > 0 or len(location) > 0:
+        if len(mobile_phone) > 0 or len(position) > 0 or len(title) > 0 or len(location) > 0:
             profile = UserProfile.objects.filter(user=request.user.id)
 
             editProfile = None
