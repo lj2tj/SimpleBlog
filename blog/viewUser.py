@@ -14,16 +14,17 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, FormView
 from blog.models import UserProfile, UserDownloadFile, BlogComment, AppSettings, WebSiteConfig, TradeMode
-from blog.models import Article, Attachment, Category, Tag, UserProfile, UserLikedArticles
+from blog.models import Article, Attachment, Category, Tag, JobPosition, JobTitle, WebSiteLevel, UserLikedArticles
 from django.http import StreamingHttpResponse, HttpResponse
 
 
 WebSiteInfo = WebSiteConfig()
 
-if AppSettings.objects.filter(name='WebSiteName') is not None:
-    WebSiteInfo.WebSiteName = AppSettings.objects.filter(name='WebSiteName')[0].value
-if AppSettings.objects.filter(name='ICP') is not None:
-    WebSiteInfo.ICP = AppSettings.objects.filter(name='ICP')[0].value
+def GetWebSiteInfo():
+    if AppSettings.objects.filter(name='WebSiteName') is not None:
+        WebSiteInfo.WebSiteName = AppSettings.objects.filter(name='WebSiteName')[0].value
+    if AppSettings.objects.filter(name='ICP') is not None:
+        WebSiteInfo.ICP = AppSettings.objects.filter(name='ICP')[0].value
 
 def LikeArticle(request):
     """
@@ -73,14 +74,38 @@ def UpdateUserInfo(request):
             RequestContext(request, {"WebSiteInfo" : WebSiteInfo}))
 
         user = User.objects.filter(id=request.user.id)[0]
+        
         email = request.GET.get('email', '')
+        if len(email) > 0:
+            if email.find("@") <= 0:
+                return HttpResponse("邮箱地址不正确")
+            else:
+                user.email = email
+                user.save()
+        
+        mobile_phone = request.GET.get('mobile_phone', '')
+        position = request.GET.get('position', '')
+        print("position:", position)
+        title = request.GET.get('jobTitle', '')
+        print("title:", title)
+        location = request.GET.get('location', '')
 
-        if email.find("@") <= 0:
-            return HttpResponse("邮箱地址不正确")
-        else:
-            print user.last_login
-            user.email = email
-            user.save()
+        if len(mobile_phone) > 0 or len(position) > 0 or len(jobTitle) > 0 or len(location) > 0:
+            profile = UserProfile.objects.filter(user=request.user.id)
+
+            editProfile = None
+            if profile is None or len(profile) <= 0:
+                editProfile = UserProfile()
+            else:
+                editProfile = profile[0]
+            editProfile.user_id = request.user.id
+            editProfile.mobile_phone = mobile_phone
+            editProfile.position = JobPosition.objects.filter(job_title=position)[0]
+            editProfile.job_title = JobTitle.objects.filter(job_title=title)[0]
+            editProfile.location = location
+            editProfile.website_level = WebSiteLevel.objects.get(id=1)
+            editProfile.save()
+
         return HttpResponse("1")
     except Exception, e:
         return HttpResponse(e)
@@ -105,6 +130,7 @@ def registerPage(request):
     """
     Show user register page.
     """
+    GetWebSiteInfo()
     return render_to_response("user/userregister.html", \
         RequestContext(request, {"WebSiteInfo" : WebSiteInfo}))
 
@@ -155,6 +181,7 @@ def loginPage(request):
     """
     User login page.
     """
+    GetWebSiteInfo()
     return render_to_response("user/login.html", \
         RequestContext(request, {"WebSiteInfo" : WebSiteInfo}))
 
@@ -182,6 +209,8 @@ def UserCenter(request):
     """
     Website user center.
     """
+    GetWebSiteInfo()
+
     if not request.user.is_authenticated():
         return render_to_response("user/login.html", RequestContext(request))
 
@@ -194,12 +223,26 @@ def UserCenter(request):
     if not any(downloaded_files):
         downloaded_files = []
     liked_articles = UserLikedArticles.objects.filter(user=request.user.id)
+    
+    profile = UserProfile.objects.filter(user=request.user.id)
+    
+    myProfile = None
+    if len(profile) <= 0:
+        myProfile = UserProfile()
+    else:
+        myProfile = profile[0] 
+
+    position = JobPosition.objects.all()
+    title = JobTitle.objects.all()
 
     dic = {'category_list':category_list, \
     'base_info': request.user, \
+    'JobPosition': position, \
+    'JobTitle': title, \
     'WebSiteInfo' : WebSiteInfo, \
     'uploaded_files': uploaded_files, \
     'downloaded_files': downloaded_files, \
+    'profile': myProfile,\
     'liked_articles':liked_articles}
     return render(request, "user/usercenter.html", dic)
 

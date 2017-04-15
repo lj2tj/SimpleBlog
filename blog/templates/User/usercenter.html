@@ -65,7 +65,7 @@
                 {% endif %}
                 >
                     <input id="email" type="email" placeholder="sample@test.com" onkeydown="trySaveEmail()" value="">
-                    <a href="#" class="btn btn-danger btn-small" onclick="saveEmail()">保存</a>
+                    <a class="btn btn-danger btn-small" onclick="saveEmail()">保存</a>
                     <div class="tipsboxalert" id="emailError" style="display: none;">
                         <p id="emailMsg"></p>
                     </div>
@@ -77,20 +77,17 @@
                 style="display: block;"
                 {% endif %}>
                     <b>{{ base_info.email }}</b>
-                    <a href="#" class="btn btn-danger btn-small" onclick="updateEmail()">修改</a>
+                    <a class="btn btn-danger btn-small" onclick="updateEmail()">修改</a>
                 </div>
             </li>
             <li>最近登录：<b>{{ base_info.last_login }}</b></li>
             <li>我的消费：<b>{{ base_info }}</b></li>
-            <li>我的头衔：<i>蜻蜓点水</i></li>
+            <li>我的头衔：<i>{{profile.website_level.description}}</i></li>
         </ul>
     </div>
     <em></em>
     <div class="integralbox integralboxtop">
     	<ul>
-        	<li>我的上传：{{ uploaded_files | length }} 篇</li>
-            <li>我的下载：{{ downloaded_files | length }} 篇</li>
-            <li>我的收藏：<a href="#">{{ liked_articles | length }}</a> 篇</li>
         </ul>
     </div>
     <div class="clear"></div>
@@ -99,7 +96,7 @@
 <div class="personal">
     <div class="personalleft" id="personalleft">
         <div class="listbox nav nav-tabs">
-            <a href="#basic" data-toggle="basic">基本信息</a>
+            <a href="#basic" data-toggle="tab">基本信息</a>
             <a href="#upload" data-toggle="tab">我的上传：{{ uploaded_files | length }} 篇</a>
             <a href="#purchase" data-toggle="tab">我的下载：{{ downloaded_files | length }} 篇</a>
             <a href="#like" data-toggle="tab">我的收藏：{{ liked_articles | length }} 篇</a>
@@ -107,16 +104,76 @@
     </div>
     <div class="personalright tab-content" id="personalright">
         <div class="tab-pane fade in active" id="basic">
-            <table id="basicArticles"></table>
+            <table class="table table-responsive" id="tblUserProfile">
+                <tbody>
+                    <tr>
+                        <td>电话</td>
+                        <td>
+                            <span id="staticMobilePhone">{{profile.mobile_phone}}</span>
+                            <edit style="display:none;">
+                                <input type="text" id="editMobilePhone" name="editMobilePhone" value="{{profile.mobile_phone}}" />
+                            </edit>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>职务</td>
+                        <td>
+                            <span id="staticPosition">{{profile.position.job_title}}</span>
+                            <edit style="display:none;">
+                                <select id="editPosition" name="editPosition">
+                                    {% for t in JobPosition %}
+                                        <option>{{ t.job_title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </edit>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>职称</td>
+                        <td>
+                            <span id="staticJobTitle">{{profile.job_title.job_title}}</span>
+                            <edit style="display:none;">
+                                <select id="editJobTitle" name="editJobTitle">
+                                    {% for t in JobTitle %}
+                                        <option>{{ t.job_title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </edit>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>住址</td>
+                        <td>
+                            <span id="staticLocation">{{profile.location}}</span>
+                            <edit style="display:none;">
+                                <input type="text" id="editLocation" name="editLocation" value="{{profile.location}}" />
+                            </edit>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <span onclick="editUserProfile()" class="button" style="float:left;">编辑</span>
+                            <edit style="display:none;">
+                                <input type="button" onclick="saveUserProfile()" class="button" style="float:left;" value="保存" />
+                            </edit>
+                        </td>
+                        <td>
+                            <edit style="display:none;">
+                                <input type="button" onclick="cancelEditUserProfile()" class="button" style="float:left;" value="取消" />
+                            </edit>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
         <div class="tab-pane fade" id="upload">
-            <table id="myUploadedArticles"></table>
+            <table id="myUploadedArticles" class="table-responsive"></table>
         </div>
         <div class="tab-pane fade" id="purchase">
-            <table id="myPurchasedArticles"></table>
+            <table id="myPurchasedArticles" class="table-responsive"></table>
         </div>
         <div class="tab-pane fade" id="like">
-            <table id="myLikedArticles"></table>
+            <table id="myLikedArticles" class="table-responsive"></table>
         </div>
     </div>
     <div class="clear"></div>
@@ -124,24 +181,29 @@
 
 <script type="text/javascript">
 var columns = [{
-                checkbox: true
-            }, {
                 field: 'title',
+                searchable: true,
+                sortable: true,
                 title: '标题'
             }, {
                 field: 'created_time',
+                sortable: true,
                 title: '创建时间'
             }, {
                 field: 'status',
+                sortable: true,
                 title: '文章状态'
             }, {
                 field: 'views',
+                sortable: true,
                 title: '浏览量'
             }, {
                 field: 'likes',
+                sortable: true,
                 title: '点赞数'
             }, {
                 field: 'price',
+                sortable: true,
                 title: '价格'
             }, {
                 field: 'category',
@@ -149,63 +211,71 @@ var columns = [{
             }, {
                 field: 'tag',
                 title: '标签'
-            },]
+            },];
 
-function showArticles(table_id, url){
-    var oTable = new TableInit(table_id, url, columns);
-    oTable.Init();
-}
+    var purchased_columns = [{
+                field: 'article__title',
+                searchable: true,
+                sortable: true,
+                title: '标题'
+            }, {
+                field: 'origin_price',
+                sortable: true,
+                title: '原价'
+            }, {
+                field: 'deal_price',
+                sortable: true,
+                title: '成交价格'
+            }, {
+                field: 'download_time',
+                sortable: true,
+                title: '购买时间'
+            }, {
+                field: 'mode',
+                sortable: true,
+                title: '交易方式'
+            },];
 
 $(function () {
-    showArticles("#basicArticles","/GetArticles/all",columns);
-    showArticles("#myUploadedArticles","/GetArticles/upload",columns);
-    showArticles("#myPurchasedArticles","/GetArticles/purchase",columns);
-    showArticles("#myLikedArticles","/GetArticles/like",columns);
+    showArticles("#myUploadedArticles", "/GetArticles/upload", columns);
+    showArticles("#myPurchasedArticles", "/GetArticles/purchase", purchased_columns);
+    showArticles("#myLikedArticles", "/GetArticles/like", columns);
 });
 
-var TableInit = function (table_id, url, columns) {
-    var oTableInit = new Object();
-    //初始化Table
-    oTableInit.Init = function () {
-        $(table_id).bootstrapTable({
-            url: url,         //请求后台的URL（*）
-            method: 'get',                      //请求方式（*）
-            //toolbar: '#toolbar',                //工具按钮用哪个容器
-            striped: true,                      //是否显示行间隔色
-            cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
-            pagination: true,                   //是否显示分页（*）
-            sortable: false,                     //是否启用排序
-            sortOrder: "asc",                   //排序方式
-            queryParams: oTableInit.queryParams,//传递参数（*）
-            sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
-            pageNumber:1,                       //初始化加载第一页，默认第一页
-            pageSize: 10,                       //每页的记录行数（*）
-            pageList: [10, 25, 50, 100],        //可供选择的每页的行数（*）
-            search: true,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
-            strictSearch: true,
-            showColumns: true,                  //是否显示所有的列
-            showRefresh: true,                  //是否显示刷新按钮
-            minimumCountColumns: 2,             //最少允许的列数
-            clickToSelect: true,                //是否启用点击选中行
-            height: 500,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
-            uniqueId: "id",                     //每一行的唯一标识，一般为主键列
-            showToggle:true,                    //是否显示详细视图和列表视图的切换按钮
-            cardView: false,                    //是否显示详细视图
-            detailView: false,                   //是否显示父子表
-            columns: columns
-        });
-    };
+function editUserProfile(){
+    $("#tblUserProfile span").hide();
+    $("#tblUserProfile edit").show();
+}
 
-    //得到查询的参数
-    oTableInit.queryParams = function (params) {
-        var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
-            limit: params.limit,   //页面大小
-            offset: params.offset  //页码
-        };
-        return temp;
-    };
-    return oTableInit;
-};
+function cancelEditUserProfile(){
+    $("#tblUserProfile edit").hide();
+    $("#tblUserProfile span").show();
+}
+
+function saveUserProfile(){
+    var mobile_phone = $('#editMobilePhone').val();
+    var editPosition = $('#editPosition').val();
+    var editJobTitle = $('#editJobTitle').val();
+    var editLocation = $('#editLocation').val();
+    
+    $.get("/UpdateUserInfo", 
+        { 
+            "mobile_phone" : mobile_phone,
+            "position" : editPosition,
+            "jobTitle" : editJobTitle,
+            "location" : editLocation
+        }, function(result){
+            if(result != "1"){
+                showGlobalMessage("更新信息失败" + result)
+            }else{
+                $('#staticMobilePhone').text(mobile_phone);
+                $('#staticPosition').text(editPosition);
+                $('#staticJobTitle').text(editJobTitle);
+                $('#staticLocation').text(editLocation);
+                cancelEditUserProfile();
+            }
+        });
+}
 
 </script>
 

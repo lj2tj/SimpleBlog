@@ -3,14 +3,19 @@
 
 <div class="container">
 
+<table class="table">
+
+<tbody>
+    
 {% for setting in settings %}
-
-<span>{{ setting.name }}</span>
-<span>{{ setting.value }}</span>
-<br />
-
+    <tr>
+        <td>{{ setting.name }}</td>
+        <td>{{ setting.value }}</td>
+        <td>{{ setting.comment }}</td>
+    </tr>
 {% endfor %}
 
+</table>
 </div>
 
 {% endblock %}

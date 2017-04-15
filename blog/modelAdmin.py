@@ -12,3 +12,7 @@ class SettingsAdmin(admin.ModelAdmin):
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'display',)
     search_fields = ('name',)
+
+class WebSiteAboutAdmin(admin.ModelAdmin):
+    list_display = ('name', 'value', 'comment',)
+    search_fields = ('name',)

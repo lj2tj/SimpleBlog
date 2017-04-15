@@ -13,7 +13,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, FormView
 from django.contrib.auth.models import User
-from blog.models import Article, Attachment, Category, Tag, UserProfile, UserLikedArticles, UserDownloadFile
+from blog.models import Article, Attachment, Category, Tag, UserProfile, UserLikedArticles, UserDownloadFile, WebSiteAbout
 from .models import BlogComment, AppSettings, WebSiteConfig
 from .forms import CustomeLoginForm, BlogCommentForm, ArticleEditForm
 from django.http import StreamingHttpResponse, HttpResponse, HttpRequest, request
@@ -21,10 +21,11 @@ from django.http import StreamingHttpResponse, HttpResponse, HttpRequest, reques
 
 WebSiteInfo = WebSiteConfig()
 
-if AppSettings.objects.filter(name='WebSiteName') is not None:
-    WebSiteInfo.WebSiteName = AppSettings.objects.filter(name='WebSiteName')[0].value
-if AppSettings.objects.filter(name='ICP') is not None:
-    WebSiteInfo.ICP = AppSettings.objects.filter(name='ICP')[0].value
+def GetWebSiteInfo():
+    if AppSettings.objects.filter(name='WebSiteName') is not None:
+        WebSiteInfo.WebSiteName = AppSettings.objects.filter(name='WebSiteName')[0].value
+    if AppSettings.objects.filter(name='ICP') is not None:
+        WebSiteInfo.ICP = AppSettings.objects.filter(name='ICP')[0].value
 
 class About(ListView):
     """
@@ -34,13 +35,14 @@ class About(ListView):
     template_name = 'blog/about.html'
 
     def get_queryset(self):
-        settings = AppSettings.objects.all()
+        settings = WebSiteAbout.objects.all()
         return settings
 
     def get_context_data(self, **kwargs):
+        GetWebSiteInfo()
         kwargs['WebSiteInfo'] = WebSiteInfo
         kwargs['category_list'] = Category.objects.all().order_by('name')
-        kwargs['settings'] = AppSettings.objects.all()
+        kwargs['settings'] = WebSiteAbout.objects.all()
         return super(About, self).get_context_data(**kwargs)
 
 
@@ -53,15 +55,16 @@ class IndexView(ListView):
     context_object_name = "article_list"
 
     def get_queryset(self):
-        article_list = Article.objects.filter(status='p')
+        article_list = Article.objects.filter(status='p')[:10]
         for article in article_list:
             article.body = markdown2.markdown(article.body, extras=['fenced-code-blocks'], )
         return article_list
 
     def get_context_data(self, **kwargs):
+        GetWebSiteInfo()
         kwargs['WebSiteInfo'] = WebSiteInfo
         kwargs['category_list'] = Category.objects.all().order_by('created_time')
-        kwargs['date_archive'] = Article.objects.archive()
+        kwargs['display'] = "l"
         kwargs['tag_list'] = Tag.objects.all().order_by('created_time')
         return super(IndexView, self).get_context_data(**kwargs)
 
@@ -84,6 +87,7 @@ class ArticleDetailView(DetailView):
         return obj
 
     def get_context_data(self, **kwargs):
+        GetWebSiteInfo()
         kwargs['WebSiteInfo'] = WebSiteInfo
         kwargs['category_list'] = Category.objects.all().order_by('created_time')
         kwargs['comment_list'] = self.object.blogcomment_set.all()
@@ -114,7 +118,8 @@ def GetArticles(request, option):
     Get articles with given option.
     """
     articles = []
-    print(option)
+    limit = int(request.GET.get('limit', '10'))
+    offset = int(request.GET.get('offset', '0'))
     if option == "all" and request.user.id == 1:
         articles = Article.objects.all().order_by('created_time')
     elif option == "all":
@@ -129,19 +134,18 @@ def GetArticles(request, option):
         if not request.user.is_authenticated():
             return render_to_response("user/login.html", RequestContext(request))
         else:
-            downloaded_file_id = UserDownloadFile.objects.filter(user=request.user.id).values('article')
-            articles = Article.objects.filter(user=request.user.id).order_by('created_time')
+            articles = UserDownloadFile.objects.filter(user=request.user.id)
+                #.values('article__title', 'origin_price', 'deal_price', 'download_time', 'trade_mode__mode')
+            print(articles)
         pass
     elif option == "like":
         if not request.user.is_authenticated():
             return render_to_response("user/login.html", RequestContext(request))
         else:
-            liked_file_id = UserLikedArticles.objects.filter(user=request.user.id).values('article')
-            articles = Article.objects.filter(user=request.user.id).order_by('created_time')
+            articles = UserLikedArticles.objects.filter(user=request.user.id)
         pass
     else:
         return [{"error":"Unknown option"}]
-    print("Count : ", len(articles))
     return HttpResponse(json.dumps({ "total" : len(articles), "rows" : queryset_to_json(articles)}))
 
 def AddBlog(request):
@@ -208,15 +212,16 @@ class CategoryView(ListView):
     context_object_name = "article_list"
 
     def get_queryset(self):
-        article_list = Article.objects.filter(category=self.kwargs['cate_id'], status='p')
+        article_list = Article.objects.filter(category=self.kwargs['cate_id'], status='p')[:10]
         for article in article_list:
             article.body = markdown2.markdown(article.body, extras=['fenced-code-blocks'], )
         return article_list
 
     def get_context_data(self, **kwargs):
+        GetWebSiteInfo()
         kwargs['WebSiteInfo'] = WebSiteInfo
         kwargs['category_list'] = Category.objects.all().order_by('created_time')
-        kwargs['date_archive'] = Article.objects.archive()
+        kwargs['display'] = "d"
         kwargs['tag_list'] = Tag.objects.all().order_by('created_time')
         return super(CategoryView, self).get_context_data(**kwargs)
 

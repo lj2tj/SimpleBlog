@@ -7,6 +7,20 @@ from django.core.urlresolvers import reverse
 from collections import defaultdict
 from tinymce.models import HTMLField
 
+class WebSiteAbout(models.Model):
+    """
+    Web site about information.
+    """
+    name = models.CharField('名称', max_length=20, null=True)
+    value = models.CharField('显示值', max_length=100, null=True)
+    comment = models.CharField('注释', max_length=200, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "网站介绍"
+        verbose_name_plural = verbose_name
 
 class TradeMode(models.Model):
     """
@@ -91,6 +105,9 @@ class UserLikedArticles(models.Model):
     comment = models.CharField("注释", max_length=100, blank=True)
     comment_time = models.DateTimeField('时间', auto_now_add=True)
 
+    def toDict(self):  
+        return dict([(attr, str(getattr(self, attr))) for attr in [f.name for f in self._meta.fields]])
+
 
 class UserDownloadFile(models.Model):
     """
@@ -105,6 +122,9 @@ class UserDownloadFile(models.Model):
         decimal_places=2, max_digits=6, help_text="下单价格，单位：元")
     download_time = models.DateTimeField('交易时间', auto_now_add=True)
     trade_mode = models.ForeignKey('TradeMode', verbose_name='交易方式')
+
+    def toDict(self):  
+        return dict([(attr, str(getattr(self, attr))) for attr in [f.name for f in self._meta.fields]])
 
 
 class ArticleManage(models.Manager):
