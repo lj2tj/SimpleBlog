@@ -56,6 +56,10 @@ def LikeArticle(request):
                 like.article=Article.objects.filter(id=article_id)[0]
                 like.save()
         
+        article = Article.objects.filter(id=article_id)[0]
+        article.likes = len(UserLikedArticles.objects.filter(user=request.user.id, article=article_id))
+        article.save()
+        
         return HttpResponse(json.dumps({
                 "result": 0
             }))
