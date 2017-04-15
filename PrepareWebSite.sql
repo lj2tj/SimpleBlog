@@ -17,7 +17,8 @@ insert into blog_jobposition (job_title) values('护士');
 insert into blog_jobposition (job_title) values('护士长');
 insert into blog_jobposition (job_title) values('护理部主任');
 
-update blog_websitelevel set job_title = '初出茅庐' where levels='A';
-update blog_websitelevel set job_title = '小有成就' where levels='B';
-update blog_websitelevel set job_title = '远近闻名' where levels='C';
-update blog_websitelevel set job_title = '江湖传说' where levels='D';
+insert into blog_websitelevel (levels, description) values('A', '初出茅庐');
+insert into blog_websitelevel (levels, description) values('B', '小有成就');
+insert into blog_websitelevel (levels, description) values('C', '远近闻名');
+insert into blog_websitelevel (levels, description) values('D', '江湖传说');
+

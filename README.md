@@ -13,11 +13,14 @@
 
         python manage.py createsuperuser
 
-6. Like step 4 and 5, run below command to start server.
+		
+6. Before running your website, please execute PrepareWebSite.sql in mysql.
+
+7. Like step 4 and 5, run below command to start server.
 
         python manage.py runserver
 
-7. Enter url http://127.0.0.1:8000/ in browser
+8. Enter url http://127.0.0.1:8000/ in browser
 
 ### contributor：
 Aaron Li.
