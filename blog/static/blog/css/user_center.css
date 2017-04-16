@@ -1,4 +1,4 @@
-.personalinfo{ width:1200px; background:#fff; border:1px solid #E8E8E8; padding:40px 25px; margin:25px auto 0;}
+.personalinfo{ background:#fff; border:1px solid #E8E8E8; padding:40px 25px; margin:25px auto 0;}
 .personalinfo em{ width:1px; height:100px; background:#E3E3E3; margin:18px 54px 0 54px; display:block; float:left;}
 
 
@@ -29,15 +29,15 @@
 .briefleftbox .briefwit h4 span.V9{ background-position:-376px -303px;}
 .briefleftbox .briefwit h4 span.V10{ background-position:-376px -337px;}
 
-.personal{ width:1200px; margin:24px auto 0; background:#fafafa;}
-.personalleft{ width:179px; background:#fafafa; float:left; height:100%; border-right:1px solid #eee;}
+.personal{ margin:24px auto 0; background:#fafafa;}
+.personalleft{ width:20%; background:#fafafa; float:left; height:100%; border-right:1px solid #eee;}
 .listbox{ width:179px; min-height:48px;}
 .listbox a{ height:48px; line-height:48px; background:#fafafa; display:block; width:179px; text-align:center; font-size:16px; color:#212121; border-bottom:1px solid #E8E8E8;}
 .listbox a:hover{ color:#3B97F6; background:#fff;}
 .listbox a.on{color:#3B97F6; background:#fff;  border-right:1px solid #fff;}
 
 
-.personalright{ width:940px; padding:40px; background:#fff; float:left; height:auto; position:relative;}
+.personalright{ margin-left: 5px; width: 74%; background:#fff; float:left; height:auto; position:relative;}
 
 
 .tipsboxalert{ width:100px; left:5%; top:18px; z-index:100; display:none}

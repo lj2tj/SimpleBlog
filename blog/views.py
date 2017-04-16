@@ -22,10 +22,19 @@ from django.http import StreamingHttpResponse, HttpResponse, HttpRequest, reques
 WebSiteInfo = WebSiteConfig()
 
 def GetWebSiteInfo():
-    if AppSettings.objects.filter(name='WebSiteName') is not None:
+    """
+    Get web site configuration information.
+    """
+    if len(AppSettings.objects.filter(name='WebSiteName')):
         WebSiteInfo.WebSiteName = AppSettings.objects.filter(name='WebSiteName')[0].value
-    if AppSettings.objects.filter(name='ICP') is not None:
+    if len(AppSettings.objects.filter(name='ICP')):
         WebSiteInfo.ICP = AppSettings.objects.filter(name='ICP')[0].value
+    if len(AppSettings.objects.filter(name='Copyright')):
+        WebSiteInfo.Copyright = AppSettings.objects.filter(name='Copyright')[0].value
+    if len(AppSettings.objects.filter(name='Address')):
+        WebSiteInfo.Address = AppSettings.objects.filter(name='Address')[0].value
+    if len(AppSettings.objects.filter(name='Phone')):
+        WebSiteInfo.Phone = AppSettings.objects.filter(name='Phone')[0].value
 
 class About(ListView):
     """
@@ -130,15 +139,16 @@ def GetArticles(request, option):
             return render_to_response("user/login.html", RequestContext(request))
         else:
             articles = Article.objects.filter(user=request.user.id).order_by('created_time')
+            #print("upload : ", queryset_to_json(articles))
         pass
     elif option == "purchase":
         if not request.user.is_authenticated():
             return render_to_response("user/login.html", RequestContext(request))
         else:
-            download = UserDownloadFile.objects.filter(user=request.user.id).values("article")
-            print("download : ", download)
-            articles = Article.objects.get(id__in=(download.article))
-                #.values('article__title', 'origin_price', 'deal_price', 'download_time', 'trade_mode__mode')
+            articles = UserDownloadFile.objects.filter(user=request.user.id) \
+                .values("article", "article__title", "origin_price", "deal_price", "download_time","trade_mode__description")
+            print("purchase : ", json_item_to_string(articles))
+            return HttpResponse(json.dumps({ "total" : len(articles), "rows" : json_item_to_string(articles)}))
         pass
     elif option == "like":
         if not request.user.is_authenticated():
@@ -315,3 +325,10 @@ def queryset_to_json(queryset):
     for o in queryset:  
             obj_arr.append(o.toDict())  
     return obj_arr 
+
+def json_item_to_string(obj): 
+    obj_arr=[]
+    for o in obj:  
+        obj_arr.append((key, obj[o])) 
+    print(obj_arr)
+    return obj_arr

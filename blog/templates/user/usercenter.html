@@ -42,6 +42,8 @@
     }
 </script>
 
+<div id="main">
+
 <div class="personalinfo">
 	<div class="briefleftbox">
     	<div class="briefpic"><span><img src="{% static 'blog/img/default_user_big.jpg' %}"></span></div>
@@ -103,7 +105,7 @@
         </div>
     </div>
     <div class="personalright tab-content" id="personalright">
-        <div class="tab-pane fade in active" id="basic">
+        <div class="tab-pane fade" id="basic">
             <table class="table table-responsive" id="tblUserProfile">
                 <tbody>
                     <tr>
@@ -179,6 +181,8 @@
     <div class="clear"></div>
 </div>
 
+</div>
+
 <script type="text/javascript">
 var columns = [{
                 field: 'title',
@@ -213,33 +217,32 @@ var columns = [{
                 title: '标签'
             },];
 
-    var purchased_columns = [{
-                field: 'article__title',
-                searchable: true,
-                sortable: true,
-                title: '标题'
-            }, {
-                field: 'origin_price',
-                sortable: true,
-                title: '原价'
-            }, {
-                field: 'deal_price',
-                sortable: true,
-                title: '成交价格'
-            }, {
-                field: 'download_time',
-                sortable: true,
-                title: '购买时间'
-            }, {
-                field: 'mode',
-                sortable: true,
-                title: '交易方式'
-            },];
+var purchased_columns = [{
+            field: 'article',
+            title: '编号'
+        },{
+            field: 'article__title',
+            searchable: true,
+            sortable: true,
+            title: '标题'
+        }, {
+            field: 'origin_price',
+            sortable: true,
+            title: '原价'
+        }, {
+            field: 'deal_price',
+            sortable: true,
+            title: '成交价格'
+        }, {
+            field: 'download_time',
+            sortable: true,
+            title: '购买时间'
+        },];
 
 $(function () {
-    showArticles("#myUploadedArticles", "/GetArticles/upload", columns);
-    showArticles("#myPurchasedArticles", "/GetArticles/purchase", purchased_columns);
-    showArticles("#myLikedArticles", "/GetArticles/like", columns);
+    showArticles("#myUploadedArticles", "/GetArticles/upload", "id", columns);
+    showArticles("#myPurchasedArticles", "/GetArticles/purchase", "article", purchased_columns);
+    showArticles("#myLikedArticles", "/GetArticles/like", "id", columns);
 });
 
 function editUserProfile(){

@@ -29,12 +29,12 @@
             }
         }
 
-        function showArticles(table_id, url, columns){
-            var oTable = new TableInit(table_id, url, columns);
+        function showArticles(table_id, url, id, columns){
+            var oTable = new TableInit(table_id, url, id, columns);
             oTable.Init();
         }
 
-        var TableInit = function (table_id, url, columns) {
+        var TableInit = function (table_id, url, id, columns) {
             var oTableInit = new Object();
             //Initialize Table
             oTableInit.Init = function () {
@@ -59,7 +59,7 @@
                     minimumCountColumns: 2,             //最少允许的列数
                     clickToSelect: true,                //是否启用点击选中行
                     height: 500,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
-                    uniqueId: "id",                     //每一行的唯一标识，一般为主键列
+                    uniqueId: id,                     //每一行的唯一标识，一般为主键列
                     showToggle:false,                    //是否显示详细视图和列表视图的切换按钮
                     cardView: false,                    //是否显示详细视图
                     detailView: false,                  //是否显示父子表
@@ -76,7 +76,7 @@
             if (window.location.href.toLowerCase().indexOf("category" > 0)){
                 cate_id = window.location.href.toLowerCase().split("category/")[1];
             }
-            
+
             //得到查询的参数
             oTableInit.queryParams = function (params) {
                 var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
@@ -134,8 +134,8 @@
 
 <div class="bottom">
     <div class="bottomboxd">
-        <p>©2012&nbsp;&nbsp;北京XX有限公司&nbsp;&nbsp;All Rights Reserved.&nbsp;&nbsp;注册地址:北京&nbsp;&nbsp;联系电话:82736610</p>
         <p>
+            {{ WebSiteInfo.Copyright }}.&nbsp;&nbsp;注册地址:{{ WebSiteInfo.Address }}&nbsp;&nbsp;联系电话: {{ WebSiteInfo.Phone }}
             <a target="_blank" href="http://www.miitbeian.gov.cn/" rel="nofollow">{{ WebSiteInfo.ICP }}</a>
             <a href="#" rel="nofollow" target="_blank">
                 <img alt="备案" src="{% static 'blog/img/gongan.png' %}" />

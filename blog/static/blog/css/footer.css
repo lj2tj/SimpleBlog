@@ -1,4 +1,4 @@
-.bottom{ width:100%; margin-top:24px; background:#FAFAFA; border-top:1px solid #E3E3E3; padding-bottom:20px; }
+.bottom{ width:80%; margin:20px auto 0px auto; background:#FAFAFA; box-shadow: 0px 0px 3px #CCC; padding-bottom:20px; }
 .bottomboxd{ margin: 20px auto 0; text-align:center; width:700px;}
 .bottomboxd p{ color:#666; font-size:12px; height:20px; line-height:20px; text-align:left;}
 .bottomboxd p a{ color:#666;}
