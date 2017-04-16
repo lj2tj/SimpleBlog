@@ -135,7 +135,9 @@ def GetArticles(request, option):
         if not request.user.is_authenticated():
             return render_to_response("user/login.html", RequestContext(request))
         else:
-            articles = UserDownloadFile.objects.filter(user=request.user.id)
+            download = UserDownloadFile.objects.filter(user=request.user.id).values("article")
+            print("download : ", download)
+            articles = Article.objects.get(id__in=(download.article))
                 #.values('article__title', 'origin_price', 'deal_price', 'download_time', 'trade_mode__mode')
         pass
     elif option == "like":
@@ -147,7 +149,7 @@ def GetArticles(request, option):
     else:
         return [{"error":"Unknown option"}]
     
-    if cate_id != "-1":
+    if cate_id != -1:
         articles = articles.filter(category=cate_id)
     return HttpResponse(json.dumps({ "total" : len(articles), "rows" : queryset_to_json(articles)}))
 
