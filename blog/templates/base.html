@@ -76,7 +76,8 @@
             oTableInit.queryParams = function (params) {
                 var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
                     limit: params.limit,   //页面大小
-                    offset: params.offset  //页码
+                    offset: params.offset,  //页码
+                    cate_id: 1
                 };
                 return temp;
             };
@@ -123,7 +124,7 @@
 {% endblock %}
 
 <div id="container">
-{% block content %}{% endblock %}
+    {% block content %}{% endblock %}
 </div>
 
 <div class="bottom">
@@ -132,7 +133,7 @@
         <p>
             <a target="_blank" href="http://www.miitbeian.gov.cn/" rel="nofollow">{{ WebSiteInfo.ICP }}</a>
             <a href="#" rel="nofollow" target="_blank">
-                <img alt="备案" src="{% static 'blog/img/gongan.png' %}">京公网安备 111111111号
+                <img alt="备案" src="{% static 'blog/img/gongan.png' %}" />
             </a>
         </p>
         <div class="clear"></div>

@@ -1,21 +1,16 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<div class="container">
-
-<table class="table">
-
-<tbody>
-    
-{% for setting in settings %}
-    <tr>
-        <td>{{ setting.name }}</td>
-        <td>{{ setting.value }}</td>
-        <td>{{ setting.comment }}</td>
-    </tr>
-{% endfor %}
-
-</table>
+<div id="main">
+    <table class="table table-responsive">
+        {% for setting in settings %}
+            <tr>
+                <td>{{ setting.name }}</td>
+                <td>{{ setting.value }}</td>
+                <td>{{ setting.comment }}</td>
+            </tr>
+        {% endfor %}
+    </table>
 </div>
 
 {% endblock %}

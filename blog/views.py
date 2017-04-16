@@ -120,8 +120,9 @@ def GetArticles(request, option):
     articles = []
     limit = int(request.GET.get('limit', '10'))
     offset = int(request.GET.get('offset', '0'))
+    cate_id = int(request.GET.get('cate_id', '-1'))
     if option == "all" and request.user.id == 1:
-        articles = Article.objects.all().order_by('created_time')
+        articles = Article.objects.filter().order_by('created_time')
     elif option == "all":
         articles = Article.objects.filter(status="p").order_by('created_time')
     elif option == "upload":
@@ -136,7 +137,6 @@ def GetArticles(request, option):
         else:
             articles = UserDownloadFile.objects.filter(user=request.user.id)
                 #.values('article__title', 'origin_price', 'deal_price', 'download_time', 'trade_mode__mode')
-            print(articles)
         pass
     elif option == "like":
         if not request.user.is_authenticated():
@@ -146,6 +146,9 @@ def GetArticles(request, option):
         pass
     else:
         return [{"error":"Unknown option"}]
+    
+    if cate_id != "-1":
+        articles = articles.filter(category=cate_id)
     return HttpResponse(json.dumps({ "total" : len(articles), "rows" : queryset_to_json(articles)}))
 
 def AddBlog(request):
@@ -221,7 +224,7 @@ class CategoryView(ListView):
         GetWebSiteInfo()
         kwargs['WebSiteInfo'] = WebSiteInfo
         kwargs['category_list'] = Category.objects.all().order_by('created_time')
-        kwargs['display'] = "d"
+        kwargs['display'] = Category.objects.filter(id=self.kwargs['cate_id'])[0].display
         kwargs['tag_list'] = Tag.objects.all().order_by('created_time')
         return super(CategoryView, self).get_context_data(**kwargs)
 

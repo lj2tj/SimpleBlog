@@ -15,16 +15,9 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, FormView
 from blog.models import UserProfile, UserDownloadFile, BlogComment, AppSettings, WebSiteConfig, TradeMode
 from blog.models import Article, Attachment, Category, Tag, JobPosition, JobTitle, WebSiteLevel, UserLikedArticles
+from blog.views import WebSiteInfo, GetWebSiteInfo
 from django.http import StreamingHttpResponse, HttpResponse
 
-
-WebSiteInfo = WebSiteConfig()
-
-def GetWebSiteInfo():
-    if AppSettings.objects.filter(name='WebSiteName') is not None:
-        WebSiteInfo.WebSiteName = AppSettings.objects.filter(name='WebSiteName')[0].value
-    if AppSettings.objects.filter(name='ICP') is not None:
-        WebSiteInfo.ICP = AppSettings.objects.filter(name='ICP')[0].value
 
 def LikeArticle(request):
     """
@@ -57,7 +50,7 @@ def LikeArticle(request):
                 like.save()
         
         article = Article.objects.filter(id=article_id)[0]
-        article.likes = len(UserLikedArticles.objects.filter(user=request.user.id, article=article_id))
+        article.likes = len(UserLikedArticles.objects.filter(article=article_id))
         article.save()
         
         return HttpResponse(json.dumps({
@@ -133,8 +126,9 @@ def registerPage(request):
     Show user register page.
     """
     GetWebSiteInfo()
+    category_list = Category.objects.all().order_by('created_time')
     return render_to_response("user/userregister.html", \
-        RequestContext(request, {"WebSiteInfo" : WebSiteInfo}))
+        RequestContext(request, {"WebSiteInfo" : WebSiteInfo, "category_list" : category_list}))
 
 
 def register(request):
@@ -184,8 +178,9 @@ def loginPage(request):
     User login page.
     """
     GetWebSiteInfo()
+    category_list = Category.objects.all().order_by('created_time')
     return render_to_response("user/login.html", \
-        RequestContext(request, {"WebSiteInfo" : WebSiteInfo}))
+        RequestContext(request, {"WebSiteInfo" : WebSiteInfo, "category_list" : category_list}))
 
 
 def login(request):
@@ -203,8 +198,9 @@ def login(request):
                 auth.login(request, user)
                 return HttpResponseRedirect("usercenter")
 
-        return render_to_response("user/login.html", \
-            RequestContext(request, {'curtime': datetime.now()}))
+    category_list = Category.objects.all().order_by('created_time')
+    return render_to_response("user/login.html", \
+        RequestContext(request, {"WebSiteInfo" : WebSiteInfo, "category_list" : category_list}))
 
 
 def UserCenter(request):
@@ -282,7 +278,6 @@ def Purchase(request, article_id, attachment_id):
     purchase_record.save()
 
     file_full_name = os.path.join(upload_file_path, unicode(the_file.attachment))
-    print 'file_full_name', file_full_name
     response = StreamingHttpResponse(file_iterator(file_full_name))
     response['Content-Type'] = 'application/octet-stream'
     response['Content-Disposition'] = 'attachment;filename="{0}"'.format(the_file.name)

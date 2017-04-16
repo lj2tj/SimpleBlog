@@ -27,7 +27,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 urlpatterns = [
-    url(r'^(?i)admin/', admin.site.urls),
+    url(r'^(?i)blogadmin/', admin.site.urls),
     url(r'', include('blog.urls', namespace='blog', app_name='blog')),
     url(r'^(?i)tinymce/', include('tinymce.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

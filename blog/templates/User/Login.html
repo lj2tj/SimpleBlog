@@ -1,6 +1,16 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% block header %}
+
+<script type="text/javascript">
+function keyDown(){
+    var value= event.keyCode;
+    if(value == 13){
+        document.forms["loginForm"].submit();
+    }
+}
+</script>
+
 <div class="pcheader">
 	<div class="headerbox">
         <a href="{% url 'blog:index' %}" class="newyxklogo">
@@ -23,7 +33,7 @@
 {% block content %}
 
 <link rel="stylesheet" href="{% static 'blog/css/login.css' %}">
-<div class="center" style="height: 439px;">
+<div class="center" style="height: 439px;" onkeydown="keyDown()">
     <div class="pc-centerbox">
         <div class="pc-cenboxleft">
             <img src="{% static 'blog/img/pc-leftppic.png' %}">
