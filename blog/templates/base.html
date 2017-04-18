@@ -29,12 +29,13 @@
             }
         }
 
-        function showArticles(table_id, url, id, columns){
-            var oTable = new TableInit(table_id, url, id, columns);
+        function showArticles(table_id, url, id_name, columns, new_url){
+            //, new_url="/article/"
+            var oTable = new TableInit(table_id, url, id_name, columns, new_url);
             oTable.Init();
         }
 
-        var TableInit = function (table_id, url, id, columns) {
+        var TableInit = function (table_id, url, id_name, columns, new_url) {
             var oTableInit = new Object();
             //Initialize Table
             oTableInit.Init = function () {
@@ -59,13 +60,13 @@
                     minimumCountColumns: 2,             //最少允许的列数
                     clickToSelect: true,                //是否启用点击选中行
                     height: 500,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
-                    uniqueId: id,                     //每一行的唯一标识，一般为主键列
+                    uniqueId: id_name,                     //每一行的唯一标识，一般为主键列
                     showToggle:false,                    //是否显示详细视图和列表视图的切换按钮
                     cardView: false,                    //是否显示详细视图
                     detailView: false,                  //是否显示父子表
                     onDblClickRow:function (e, row) {
-                                    var article_id = $(row).attr("data-uniqueid")
-                                    window.location.href = "/article/" + article_id;
+                                    var row_uniqueid = $(row).attr("data-uniqueid")
+                                    window.location.href = new_url + row_uniqueid;
                                 },
                     idField:"id",
                     columns: columns

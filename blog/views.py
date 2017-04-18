@@ -117,9 +117,21 @@ def NewArticle(request):
     """
     category_list = Category.objects.all().order_by('created_time')
     tag_list = Tag.objects.all().order_by('created_time')
+    GetWebSiteInfo()
+    dic = {'category_list':category_list, 'tag_list': tag_list, 'WebSiteInfo': WebSiteInfo}
+    return render(request, "blog/add_article.html", dic)
 
-    dic = {'category_list':category_list, 'tag_list': tag_list}
-    return render(request, "blog/add_blog.html", dic)
+def EditArticle(request, article_id):
+    """
+    Edit existing article page.
+    """
+    category_list = Category.objects.all().order_by('created_time')
+    tag_list = Tag.objects.all().order_by('created_time')
+    article = Article.objects.get(id=article_id)
+
+    GetWebSiteInfo()
+    dic = {'category_list':category_list, 'tag_list': tag_list, 'article': article, 'WebSiteInfo': WebSiteInfo}
+    return render(request, "blog/edit_article.html", dic)
 
 
 def GetArticles(request, option):
@@ -163,7 +175,7 @@ def GetArticles(request, option):
         articles = articles.filter(category=cate_id)
     return HttpResponse(json.dumps({ "total" : len(articles), "rows" : queryset_to_json(articles)}))
 
-def AddBlog(request):
+def AddArticle(request):
     """
     Add a new blog.     
     """
@@ -216,6 +228,62 @@ def AddBlog(request):
 
         article_id = Article.objects.filter(title=title, status=article.status, category=article.category, tag=article.tag)[0]
         url = "article/" + str(article_id.id)
+        return HttpResponseRedirect(url)
+
+def UpdateArticle(request, article_id):
+    """
+    Update an existing article.     
+    """
+    if not request.user.is_authenticated():
+        return render_to_response("user/login.html", RequestContext(request))
+
+    if request.method == 'POST':
+        title = request.POST.get('title', '')
+        body = request.POST.get('body', '')
+        status = request.POST.get('status', '')
+        abstract = request.POST.get('abstract', '')
+        keywords = request.POST.get('keywords', '')
+        en_keywords = request.POST.get('en_keywords', '')
+        topped = request.POST.get('topped', '')
+        price = request.POST.get('price', '')
+        attachment = request.POST.get('attachment', '')
+        category = request.POST.get('category', '')
+        tag = request.POST.get('tag', '')
+
+        myFile = request.FILES.get("attachment", None)
+        if not myFile:
+            return HttpResponse('Please upload file.')
+
+        destination = open(os.path.join(settings.MEDIA_ROOT, myFile.name),'wb+')
+        for chunk in myFile.chunks(): 
+            destination.write(chunk)  
+        destination.close()
+        
+
+        attachedFile = Attachment()
+        attachedFile.name = myFile.name
+        attachedFile.attachment = myFile.name
+        newFile = attachedFile.save()
+
+
+        article = Article.objects.get(id=article_id)
+        article.title = title
+        article.body = body
+        article.status = status
+        article.abstract = abstract
+        article.keywords = keywords
+        article.en_keywords = en_keywords
+        article.topped = topped
+        article.price = price
+        article.attachment = Attachment.objects.filter(name=myFile.name)[0]
+        article.category = Category.objects.filter(id=category)[0]
+        article.tag = Tag.objects.filter(id=tag)[0]
+        article.user = User.objects.filter(id=request.user.id)[0]
+        article.save()
+
+        article_id = Article.objects.filter(title=title, status=article.status, category=article.category, tag=article.tag)[0]
+        url = "/article/" + str(article_id.id)
+        print(url)
         return HttpResponseRedirect(url)
 
 class CategoryView(ListView):

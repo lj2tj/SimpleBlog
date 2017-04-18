@@ -45,7 +45,7 @@ var columns = [{
     {% if display == 'l' %} {% comment %} display as list {% endcomment %}
         <table id="articleLiatTabble" class="table-responsive"></table>
         <script type="text/javascript">
-            showArticles("#articleLiatTabble", "/GetArticles/all", "id", columns);
+            showArticles("#articleLiatTabble", "/GetArticles/all", "id", columns, "/article/");
             $('#articleLiatTabble').on('onDblClickRow.bs.table', function (e, arg1, arg2) {
                 alert(arg1)
             });

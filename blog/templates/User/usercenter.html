@@ -240,9 +240,9 @@ var purchased_columns = [{
         },];
 
 $(function () {
-    showArticles("#myUploadedArticles", "/GetArticles/upload", "id", columns);
-    showArticles("#myPurchasedArticles", "/GetArticles/purchase", "article", purchased_columns);
-    showArticles("#myLikedArticles", "/GetArticles/like", "id", columns);
+    showArticles("#myUploadedArticles", "/GetArticles/upload", "id", columns, "/EditArticle/");
+    showArticles("#myPurchasedArticles", "/GetArticles/purchase", "article", purchased_columns, "/article/");
+    showArticles("#myLikedArticles", "/GetArticles/like", "id", columns, "/article/");
 });
 
 function editUserProfile(){
