@@ -142,7 +142,6 @@ def GetArticles(request, option):
     limit = int(request.GET.get('limit', '10'))
     offset = int(request.GET.get('offset', '0'))
     searchText = request.GET.get('searchText', '')
-    print("searchText", searchText)
     
     sortName = request.GET.get('sortName', '')
     if len(sortName) <= 0:
@@ -154,11 +153,20 @@ def GetArticles(request, option):
     
     cate_id = int(request.GET.get('cate_id', '-1'))
     
-    all_articles = Article.objects.all()
+    all_articles = Article.objects.filter(title__contains=searchText)
+    if cate_id != -1:
+        all_articles = Article.objects.filter(title__contains=searchText, category=cate_id)
+
     if option == "all" and request.user.id == 1:
-        articles = all_articles.filter(title__contains=searchText).order_by(sortName)[offset:(offset+limit)]
+        if cate_id != -1:
+            articles = all_articles.filter(title__contains=searchText, category=cate_id).order_by(sortName)[offset:(offset+limit)]
+        else:
+            articles = all_articles.filter(title__contains=searchText).order_by(sortName)[offset:(offset+limit)]
     elif option == "all":
-        articles = all_articles.filter(status="p", title__contains=searchText).order_by(sortName)[offset:(offset+limit)]
+        if cate_id != -1:
+            articles = all_articles.filter(status="p", title__contains=searchText, category=cate_id).order_by(sortName)[offset:(offset+limit)]
+        else:
+            articles = all_articles.filter(status="p", title__contains=searchText).order_by(sortName)[offset:(offset+limit)]
     elif option == "upload":
         if not request.user.is_authenticated():
             return render_to_response("user/login.html", RequestContext(request))
@@ -184,8 +192,6 @@ def GetArticles(request, option):
     else:
         return [{"error":"Unknown option"}]
     
-    if cate_id != -1:
-        articles = articles.filter(category=cate_id)[offset:(offset+limit)]
     return HttpResponse(json.dumps({ "total" : len(all_articles), "rows" : queryset_to_json(articles)}))
 
 def AddArticle(request):
