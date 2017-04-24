@@ -128,7 +128,7 @@
                             <label for="blog_tag">标签:</label>                  
                             <div class="related-widget-wrapper">
                                 <select id="blog_tag" name="tag">
-                                    <option value="" selected="selected">---------</option>
+                                    <option value="" selected="selected">---------</option> 
                                     {% for tag in tag_list %}
                                     {% if article.tag.id == tag.id %}
                                     <option value="{{ tag.id }}" selected="selected">{{ tag.name }}</option>

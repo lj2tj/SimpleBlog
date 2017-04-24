@@ -141,24 +141,37 @@ def GetArticles(request, option):
     articles = []
     limit = int(request.GET.get('limit', '10'))
     offset = int(request.GET.get('offset', '0'))
+    searchText = request.GET.get('searchText', '')
+    print("searchText", searchText)
+    
+    sortName = request.GET.get('sortName', '')
+    if len(sortName) <= 0:
+        sortName = 'created_time'
+
+    sortOrder = request.GET.get('sortOrder', '')
+    if sortOrder == "desc":
+        sortName = "-" + sortName
+    
     cate_id = int(request.GET.get('cate_id', '-1'))
+    
+    all_articles = Article.objects.all()
     if option == "all" and request.user.id == 1:
-        articles = Article.objects.filter().order_by('created_time')
+        articles = all_articles.filter(title__contains=searchText).order_by(sortName)[offset:(offset+limit)]
     elif option == "all":
-        articles = Article.objects.filter(status="p").order_by('created_time')
+        articles = all_articles.filter(status="p", title__contains=searchText).order_by(sortName)[offset:(offset+limit)]
     elif option == "upload":
         if not request.user.is_authenticated():
             return render_to_response("user/login.html", RequestContext(request))
         else:
-            articles = Article.objects.filter(user=request.user.id).order_by('created_time')
+            articles = all_articles.filter(user=request.user.id, title__contains=searchText).order_by(sortName)[offset:(offset+limit)]
             #print("upload : ", queryset_to_json(articles))
         pass
     elif option == "purchase":
         if not request.user.is_authenticated():
             return render_to_response("user/login.html", RequestContext(request))
         else:
-            articles = UserDownloadFile.objects.filter(user=request.user.id) \
-                .values("article", "article__title", "origin_price", "deal_price", "download_time","trade_mode__description")
+            articles = UserDownloadFile.objects.filter(user=request.user.id, title__contains=searchText).order_by(sortName) \
+                .values("article", "article__title", "origin_price", "deal_price", "download_time","trade_mode__description")[offset:(offset+limit)]
             print("purchase : ", json_item_to_string(articles))
             return HttpResponse(json.dumps({ "total" : len(articles), "rows" : json_item_to_string(articles)}))
         pass
@@ -166,14 +179,14 @@ def GetArticles(request, option):
         if not request.user.is_authenticated():
             return render_to_response("user/login.html", RequestContext(request))
         else:
-            articles = UserLikedArticles.objects.filter(user=request.user.id)
+            articles = UserLikedArticles.objects.filter(user=request.user.id, title__contains=searchText).order_by(sortName)[offset:(offset+limit)]
         pass
     else:
         return [{"error":"Unknown option"}]
     
     if cate_id != -1:
-        articles = articles.filter(category=cate_id)
-    return HttpResponse(json.dumps({ "total" : len(articles), "rows" : queryset_to_json(articles)}))
+        articles = articles.filter(category=cate_id)[offset:(offset+limit)]
+    return HttpResponse(json.dumps({ "total" : len(all_articles), "rows" : queryset_to_json(articles)}))
 
 def AddArticle(request):
     """
