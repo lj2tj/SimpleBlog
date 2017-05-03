@@ -25,15 +25,15 @@ def GetWebSiteInfo():
     """
     Get web site configuration information.
     """
-    if len(AppSettings.objects.filter(name='WebSiteName')):
+    if len(AppSettings.objects.filter(name='WebSiteName')) > 0:
         WebSiteInfo.WebSiteName = AppSettings.objects.filter(name='WebSiteName')[0].value
-    if len(AppSettings.objects.filter(name='ICP')):
+    if len(AppSettings.objects.filter(name='ICP')) > 0:
         WebSiteInfo.ICP = AppSettings.objects.filter(name='ICP')[0].value
-    if len(AppSettings.objects.filter(name='Copyright')):
+    if len(AppSettings.objects.filter(name='Copyright')) > 0:
         WebSiteInfo.Copyright = AppSettings.objects.filter(name='Copyright')[0].value
-    if len(AppSettings.objects.filter(name='Address')):
+    if len(AppSettings.objects.filter(name='Address')) > 0:
         WebSiteInfo.Address = AppSettings.objects.filter(name='Address')[0].value
-    if len(AppSettings.objects.filter(name='Phone')):
+    if len(AppSettings.objects.filter(name='Phone')) > 0:
         WebSiteInfo.Phone = AppSettings.objects.filter(name='Phone')[0].value
 
 class About(ListView):
@@ -152,47 +152,43 @@ def GetArticles(request, option):
         sortName = "-" + sortName
     
     cate_id = int(request.GET.get('cate_id', '-1'))
-    
-    all_articles = Article.objects.filter(title__contains=searchText)
-    if cate_id != -1:
-        all_articles = Article.objects.filter(title__contains=searchText, category=cate_id)
 
     if option == "all" and request.user.id == 1:
         if cate_id != -1:
-            articles = all_articles.filter(title__contains=searchText, category=cate_id).order_by(sortName)[offset:(offset+limit)]
+            articles = Article.objects.filter(title__contains=searchText, category=cate_id).order_by(sortName)
         else:
-            articles = all_articles.filter(title__contains=searchText).order_by(sortName)[offset:(offset+limit)]
+            articles = Article.objects.filter(title__contains=searchText).order_by(sortName)
     elif option == "all":
         if cate_id != -1:
-            articles = all_articles.filter(status="p", title__contains=searchText, category=cate_id).order_by(sortName)[offset:(offset+limit)]
+            articles = Article.objects.filter(status="p", title__contains=searchText, category=cate_id).order_by(sortName)
         else:
-            articles = all_articles.filter(status="p", title__contains=searchText).order_by(sortName)[offset:(offset+limit)]
+            articles = Article.objects.filter(status="p", title__contains=searchText).order_by(sortName)
     elif option == "upload":
         if not request.user.is_authenticated():
             return render_to_response("user/login.html", RequestContext(request))
         else:
-            articles = all_articles.filter(user=request.user.id, title__contains=searchText).order_by(sortName)[offset:(offset+limit)]
-            #print("upload : ", queryset_to_json(articles))
+            articles = Article.objects.filter(user=request.user.id, title__contains=searchText).order_by(sortName)
         pass
     elif option == "purchase":
         if not request.user.is_authenticated():
             return render_to_response("user/login.html", RequestContext(request))
         else:
-            articles = UserDownloadFile.objects.filter(user=request.user.id, title__contains=searchText).order_by(sortName) \
-                .values("article", "article__title", "origin_price", "deal_price", "download_time","trade_mode__description")[offset:(offset+limit)]
-            print("purchase : ", json_item_to_string(articles))
-            return HttpResponse(json.dumps({ "total" : len(articles), "rows" : json_item_to_string(articles)}))
+            articles = UserDownloadFile.objects.filter(user=request.user.id, article__title__icontains=searchText) \
+                .values("article", "article__title", "origin_price", "deal_price", "download_time","trade_mode__description")
+            return HttpResponse(json.dumps({ "total" : len(articles), "rows" : json_item_to_string(articles[offset:(offset+limit)])}))
         pass
     elif option == "like":
         if not request.user.is_authenticated():
             return render_to_response("user/login.html", RequestContext(request))
         else:
-            articles = UserLikedArticles.objects.filter(user=request.user.id, title__contains=searchText).order_by(sortName)[offset:(offset+limit)]
+            articles = UserLikedArticles.objects.filter(user=request.user.id, article__title__icontains=searchText) \
+                .values("article__id", "article__title", "article__price", "article__created_time", "article__category", "article__tag")
+            return HttpResponse(json.dumps({ "total" : len(articles), "rows" : json_item_to_string(articles[offset:(offset+limit)])}))
         pass
     else:
         return [{"error":"Unknown option"}]
     
-    return HttpResponse(json.dumps({ "total" : len(all_articles), "rows" : queryset_to_json(articles)}))
+    return HttpResponse(json.dumps({ "total" : len(articles), "rows" : queryset_to_json(articles[offset:(offset+limit)])}))
 
 def AddArticle(request):
     """
@@ -415,7 +411,7 @@ def queryset_to_json(queryset):
 
 def json_item_to_string(obj): 
     obj_arr=[]
-    for o in obj:  
-        obj_arr.append((key, obj[o])) 
-    print(obj_arr)
+    for o in obj:
+        serialized = dict([(attr, str(o[attr])) for attr in [f for f in o]])
+        obj_arr.append(serialized) 
     return obj_arr

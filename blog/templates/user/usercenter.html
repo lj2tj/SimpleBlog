@@ -218,9 +218,6 @@ var columns = [{
             },];
 
 var purchased_columns = [{
-            field: 'article',
-            title: '编号'
-        },{
             field: 'article__title',
             searchable: true,
             sortable: true,
@@ -239,10 +236,31 @@ var purchased_columns = [{
             title: '购买时间'
         },];
 
+var liked_columns = [{
+                field: 'article__title',
+                searchable: true,
+                sortable: true,
+                title: '标题'
+            }, {
+                field: 'article__created_time',
+                sortable: true,
+                title: '创建时间'
+            }, {
+                field: 'article__price',
+                sortable: true,
+                title: '价格'
+            }, {
+                field: 'article__category',
+                title: '分类'
+            }, {
+                field: 'article__tag',
+                title: '标签'
+            },];
+
 $(function () {
     showArticles("#myUploadedArticles", "/GetArticles/upload", "id", columns, "/EditArticle/");
     showArticles("#myPurchasedArticles", "/GetArticles/purchase", "article", purchased_columns, "/article/");
-    showArticles("#myLikedArticles", "/GetArticles/like", "id", columns, "/article/");
+    showArticles("#myLikedArticles", "/GetArticles/like", "article__id", liked_columns, "/article/");
 });
 
 function editUserProfile(){
