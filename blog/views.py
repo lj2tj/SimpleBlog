@@ -29,6 +29,8 @@ def GetWebSiteInfo():
         WebSiteInfo.WebSiteName = AppSettings.objects.filter(name='WebSiteName')[0].value
     if len(AppSettings.objects.filter(name='ICP')) > 0:
         WebSiteInfo.ICP = AppSettings.objects.filter(name='ICP')[0].value
+    if len(AppSettings.objects.filter(name='ICP_address')) > 0:
+        WebSiteInfo.ICP_address = AppSettings.objects.filter(name='ICP_address')[0].value
     if len(AppSettings.objects.filter(name='Copyright')) > 0:
         WebSiteInfo.Copyright = AppSettings.objects.filter(name='Copyright')[0].value
     if len(AppSettings.objects.filter(name='Address')) > 0:

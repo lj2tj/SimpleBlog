@@ -141,7 +141,7 @@
     <div class="bottomboxd">
         <p>
             {{ WebSiteInfo.Copyright }}.&nbsp;&nbsp;注册地址:{{ WebSiteInfo.Address }}&nbsp;&nbsp;联系电话: {{ WebSiteInfo.Phone }}
-            <a target="_blank" href="http://www.miitbeian.gov.cn/" rel="nofollow">{{ WebSiteInfo.ICP }}</a>
+            <a target="_blank" href="{{ WebSiteInfo.ICP_address }}" rel="nofollow">{{ WebSiteInfo.ICP }}</a>
             <a href="#" rel="nofollow" target="_blank">
                 <img alt="备案" src="{% static 'blog/img/gongan.png' %}" />
             </a>
